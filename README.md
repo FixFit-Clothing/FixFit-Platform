@@ -72,45 +72,6 @@ src/
 
 ---
 
-## 🎯 Current Progress
-
-### ✅ Sprint 1
-
-- Next.js setup
-- TypeScript
-- Tailwind CSS
-- App Router
-- ESLint
-- Project structure
-
-### ✅ Sprint 2
-
-- Installed project dependencies
-- React Query
-- Zustand
-- Supabase
-- Framer Motion
-- Zod
-- Sonner
-- React Hook Form
-
----
-
-## 🗺 Roadmap
-
-- [x] Project Setup
-- [x] Install Dependencies
-- [ ] Design System
-- [ ] Shared UI Components
-- [ ] Landing Page Migration
-- [ ] Estimator
-- [ ] Dashboard
-- [ ] Authentication
-- [ ] Payments
-- [ ] Realtime Updates
-
----
-
 ## 📄 License
 
 Private Project
