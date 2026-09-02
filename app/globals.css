@@ -1,26 +1,390 @@
 @import "tailwindcss";
 
+/*
+  FixFit design tokens — sourced from https://fixfit.in/style.css
+  Marketing site is the visual source of truth.
+  Dark tokens exist for future dashboards via `.dark` (opt-in, not auto).
+*/
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Color */
+  --background: #fcf8f2;
+  --surface: #ffffff;
+  --surface-elevated: #ffffff;
+  --surface-muted: #e8e2d9;
+
+  --primary: #f97316;
+  --primary-hover: #ea580c;
+  --primary-foreground: #ffffff;
+  --primary-glow: rgba(249, 115, 22, 0.15);
+  --primary-glow-strong: rgba(249, 115, 22, 0.25);
+
+  --secondary: #0d0c0b;
+  --secondary-foreground: #fcf8f2;
+
+  --accent: #ea580c;
+  --accent-foreground: #ffffff;
+
+  --text-primary: #292524;
+  --text-secondary: #1c1917;
+  --text-muted: #78716c;
+  --text-subtle: #a8a29e;
+
+  --border: rgba(13, 12, 11, 0.06);
+  --border-strong: rgba(13, 12, 11, 0.12);
+  --border-accent: rgba(249, 115, 22, 0.25);
+
+  --ring: #f97316;
+  --focus-ring: #f97316;
+
+  --success: #15803d;
+  --success-foreground: #ffffff;
+  --warning: #d97706;
+  --warning-foreground: #ffffff;
+  --error: #dc2626;
+  --error-foreground: #ffffff;
+
+  /* Radius — controls / buttons / cards / large surfaces / pills */
+  --radius-control: 8px;
+  --radius-button: 14px;
+  --radius-card: 24px;
+  --radius-surface: 36px;
+  --radius-pill: 9999px;
+
+  /* Shadows — soft, warm, low-contrast */
+  --elevation-sm: 0 2px 8px rgba(13, 12, 11, 0.04);
+  --elevation-md: 0 8px 30px rgba(13, 12, 11, 0.06);
+  --elevation-lg: 0 20px 50px rgba(13, 12, 11, 0.1);
+  --elevation-glow: 0 12px 32px rgba(249, 115, 22, 0.18);
+
+  /* Motion */
+  --motion-ease: cubic-bezier(0.25, 0.8, 0.25, 1);
+  --motion-ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+  --motion-fast: 150ms;
+  --motion-normal: 300ms;
+  --motion-slow: 500ms;
+
+  /* Layout */
+  --container-max: 75rem; /* 1200px — live site */
+  --container-wide: 90rem;
+  --gutter: clamp(1.25rem, 6vw, 4.5rem);
+
+  /*
+    Spacing conventions (use Tailwind scale in components):
+    - Control padding:  p-2–p-3
+    - Card padding:     p-6 (24px) → p-10 (40px) for large cards
+    - Grid gaps:        gap-4–gap-6
+    - Page padding:     .container / .container-wide
+    - Section padding:  .section / .section-sm / .section-lg
+  */
+}
+
+.dark {
+  --background: #0d0c0b;
+  --surface: #1c1917;
+  --surface-elevated: #292524;
+  --surface-muted: #292524;
+
+  --primary: #f97316;
+  --primary-hover: #fb923c;
+  --primary-foreground: #0d0c0b;
+  --primary-glow: rgba(249, 115, 22, 0.2);
+  --primary-glow-strong: rgba(249, 115, 22, 0.32);
+
+  --secondary: #fcf8f2;
+  --secondary-foreground: #0d0c0b;
+
+  --accent: #fb923c;
+  --accent-foreground: #0d0c0b;
+
+  --text-primary: #f5f0e8;
+  --text-secondary: #e7e5e4;
+  --text-muted: #a8a29e;
+  --text-subtle: #78716c;
+
+  --border: rgba(252, 248, 242, 0.1);
+  --border-strong: rgba(252, 248, 242, 0.18);
+  --border-accent: rgba(249, 115, 22, 0.35);
+
+  --ring: #f97316;
+
+  --success: #4ade80;
+  --success-foreground: #0d0c0b;
+  --warning: #fbbf24;
+  --warning-foreground: #0d0c0b;
+  --error: #f87171;
+  --error-foreground: #0d0c0b;
+
+  --elevation-sm: 0 2px 8px rgba(0, 0, 0, 0.35);
+  --elevation-md: 0 8px 30px rgba(0, 0, 0, 0.4);
+  --elevation-lg: 0 20px 50px rgba(0, 0, 0, 0.5);
+  --elevation-glow: 0 12px 32px rgba(249, 115, 22, 0.22);
 }
 
 @theme inline {
   --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-elevated: var(--surface-elevated);
+  --color-surface-muted: var(--surface-muted);
+
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-glow: var(--primary-glow);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-foreground: var(--text-primary);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-muted: var(--surface-muted);
+  --color-muted-foreground: var(--text-muted);
+  --color-subtle: var(--text-subtle);
+
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-border-accent: var(--border-accent);
+
+  --color-ring: var(--ring);
+
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-error: var(--error);
+  --color-error-foreground: var(--error-foreground);
+
   --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
   --font-serif: var(--font-cormorant), ui-serif, Georgia, serif;
   --font-mono: var(--font-dm-mono), ui-monospace, monospace;
+
+  --radius-sm: var(--radius-control);
+  --radius-md: var(--radius-button);
+  --radius-lg: var(--radius-card);
+  --radius-xl: var(--radius-surface);
+  --radius-full: var(--radius-pill);
+  --radius: var(--radius-button);
+
+  --shadow-sm: var(--elevation-sm);
+  --shadow-md: var(--elevation-md);
+  --shadow-lg: var(--elevation-lg);
+  --shadow-glow: var(--elevation-glow);
+
+  --ease-standard: var(--motion-ease);
+  --ease-smooth: var(--motion-ease-smooth);
+
+  --duration-fast: var(--motion-fast);
+  --duration-normal: var(--motion-normal);
+  --duration-slow: var(--motion-slow);
+
+  --spacing-gutter: var(--gutter);
+  --spacing-card: 1.5rem;
+  --spacing-card-lg: 2.5rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--text-primary);
+    font-family: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+    line-height: 1.6;
+  }
+
+  ::selection {
+    background-color: var(--primary-glow-strong);
+    color: var(--secondary);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
+/* Layout */
+
+@utility container {
+  margin-inline: auto;
+  width: 100%;
+  max-width: var(--container-max);
+  padding-inline: var(--gutter);
+}
+
+@utility container-wide {
+  margin-inline: auto;
+  width: 100%;
+  max-width: var(--container-wide);
+  padding-inline: var(--gutter);
+}
+
+@utility section {
+  padding-block: clamp(4.375rem, 10vw, 6.25rem);
+}
+
+@utility section-sm {
+  padding-block: clamp(3rem, 6vw, 4.5rem);
+}
+
+@utility section-lg {
+  padding-block: clamp(5rem, 12vw, 7.5rem);
+}
+
+/* Typography — display / editorial (Cormorant Garamond) */
+
+@utility display-xl {
+  font-family: var(--font-cormorant), ui-serif, Georgia, serif;
+  font-size: clamp(2.5rem, 6vw, 4.75rem);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  line-height: 1.1;
+  color: var(--secondary);
+}
+
+@utility display-lg {
+  font-family: var(--font-cormorant), ui-serif, Georgia, serif;
+  font-size: clamp(2.25rem, 5vw, 3.75rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.12;
+  color: var(--secondary);
+}
+
+@utility display-md {
+  font-family: var(--font-cormorant), ui-serif, Georgia, serif;
+  font-size: clamp(2rem, 4.5vw, 3.25rem);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+  color: var(--secondary);
+}
+
+@utility heading-xl {
+  font-family: var(--font-cormorant), ui-serif, Georgia, serif;
+  font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: var(--secondary);
+}
+
+@utility heading-lg {
+  font-family: var(--font-cormorant), ui-serif, Georgia, serif;
+  font-size: clamp(1.375rem, 2.5vw, 2rem);
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  line-height: 1.25;
+  color: var(--secondary);
+}
+
+/* UI headings (DM Sans) */
+
+@utility heading-md {
+  font-family: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(1.125rem, 1.6vw, 1.25rem);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.35;
+  color: var(--text-secondary);
+}
+
+@utility heading-sm {
+  font-family: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.4;
+  color: var(--text-secondary);
+}
+
+@utility body-lg {
+  font-family: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(1.0625rem, 1.3vw, 1.125rem);
+  font-weight: 400;
+  line-height: 1.65;
+  color: var(--text-muted);
+}
+
+@utility body-md {
+  font-family: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(0.9375rem, 1.2vw, 1.0625rem);
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+@utility body-sm {
+  font-family: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+
+@utility label {
+  font-family: var(--font-dm-mono), ui-monospace, monospace;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  line-height: 1.4;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+
+@utility caption {
+  font-family: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-weight: 400;
+  line-height: 1.45;
+  color: var(--text-subtle);
+}
+
+@utility mono {
+  font-family: var(--font-dm-mono), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+@utility transition-fast {
+  transition-property: color, background-color, border-color, opacity, box-shadow,
+    transform;
+  transition-duration: var(--motion-fast);
+  transition-timing-function: var(--motion-ease);
+}
+
+@utility transition-normal {
+  transition-property: color, background-color, border-color, opacity, box-shadow,
+    transform;
+  transition-duration: var(--motion-normal);
+  transition-timing-function: var(--motion-ease);
+}
+
+@utility transition-slow {
+  transition-property: color, background-color, border-color, opacity, box-shadow,
+    transform;
+  transition-duration: var(--motion-slow);
+  transition-timing-function: var(--motion-ease-smooth);
 }

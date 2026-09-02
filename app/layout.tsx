@@ -51,7 +51,9 @@ export default function RootLayout({
       lang="en"
       className={`${dmSans.variable} ${cormorant.variable} ${dmMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col font-sans">{children}</body>
+      <body className="flex min-h-full flex-col bg-background font-sans text-foreground">
+        {children}
+      </body>
     </html>
   );
 }
