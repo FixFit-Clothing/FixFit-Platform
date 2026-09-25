@@ -1,4 +1,12 @@
-/* Phase 1 landing styles: navbar, hero, footer. Tokens live in globals.css. */
+/* =========================================================
+   Phase 1 Landing Styles
+   Navbar, Hero, Footer
+   Tokens live in globals.css.
+   ========================================================= */
+
+/* =========================================================
+   SITE WRAPPER
+   ========================================================= */
 
 .site-wrap {
   margin-inline: auto;
@@ -7,43 +15,72 @@
   padding-inline: 24px;
 }
 
+/* =========================================================
+   HEADER / NAVBAR
+   ========================================================= */
+
 .site-header {
   position: sticky;
   top: 0;
   z-index: 50;
+
   background: rgba(255, 247, 237, 0.94);
   backdrop-filter: blur(6px);
+
   border-bottom: 1px solid var(--line);
 }
 
 .site-nav {
   display: flex;
+
+  width: 100%;
   max-width: 1180px;
+
   margin-inline: auto;
+
   padding: 16px 24px;
+
   align-items: center;
   justify-content: space-between;
+
   gap: 12px;
 }
+
+/* =========================================================
+   LOGO
+   ========================================================= */
 
 .site-logo {
   display: inline-flex;
   align-items: center;
+
+  flex: 0 0 auto;
+
   font-family: var(--font-cormorant), ui-serif, Georgia, serif;
+
   font-size: 22px;
   font-weight: 700;
+
   letter-spacing: -0.02em;
+
   color: var(--charcoal);
+
   text-decoration: none;
+
   line-height: 1;
 }
 
 .site-logo-mark {
   display: inline-block;
+
   margin-left: 2px;
+
   color: var(--saffron);
+
   font-size: 16px;
+
   transform-origin: 50% 80%;
+
   animation: stitch-poke 2.6s ease-in-out infinite;
 }
 
@@ -51,19 +88,30 @@
   animation-duration: 0.7s;
 }
 
+/* =========================================================
+   DESKTOP NAVIGATION
+   ========================================================= */
+
 .site-nav-links {
   display: flex;
+
   flex-wrap: wrap;
+
   gap: 24px;
+
   font-size: 14px;
   font-weight: 500;
 }
 
 .site-nav-links a {
   color: var(--charcoal);
+
   text-decoration: none;
+
   padding-bottom: 3px;
+
   border-bottom: 2px solid transparent;
+
   transition:
     color var(--motion-fast) var(--motion-ease),
     border-color var(--motion-fast) var(--motion-ease);
@@ -72,17 +120,35 @@
 .site-nav-links a:hover,
 .site-nav-links a[aria-current="page"] {
   color: var(--saffron-deep);
+
   border-color: var(--saffron);
 }
 
+/* =========================================================
+   NAV CTA
+   ========================================================= */
+
 .site-nav-cta {
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  flex: 0 0 auto;
+
   background: var(--charcoal);
+
   color: var(--cream);
+
   padding: 8px 16px;
+
   border-radius: 10px;
+
   font-size: 13px;
   font-weight: 600;
+
   text-decoration: none;
+
   transition: background-color var(--motion-fast) var(--motion-ease);
 }
 
@@ -90,47 +156,133 @@
   background: #292524;
 }
 
+/* =========================================================
+   MOBILE HAMBURGER
+   ========================================================= */
+
 .site-hamburger {
   display: none;
+
+  position: relative;
+
+  /*
+   * IMPORTANT:
+   * Keep this below the drawer.
+   * The drawer uses z-index: 100.
+   */
+  z-index: 1;
+
+  flex: 0 0 auto;
+
   width: 38px;
   height: 38px;
+
+  padding: 0;
+
   flex-direction: column;
   align-items: center;
   justify-content: center;
+
   gap: 8px;
-  background: none;
+
+  background: transparent;
+
   border: 1.5px solid var(--charcoal);
+
   border-radius: 10px;
+
   cursor: pointer;
+
   color: var(--charcoal);
 }
 
 .site-hamburger span {
   display: block;
+
   width: 18px;
   height: 2px;
+
   background: var(--charcoal);
+
+  border-radius: 2px;
 }
 
+/* =========================================================
+   MOBILE DRAWER
+   ========================================================= */
+
 .site-drawer {
+  /*
+   * IMPORTANT:
+   * This is intentionally higher than the header/hamburger.
+   * The hamburger must NOT appear over the drawer.
+   */
   position: fixed;
+
   inset: 0;
-  z-index: 60;
-  overflow: hidden;
+
+  z-index: 100;
+
+  /*
+   * Do NOT use 100vw here.
+   * 100vw can include the scrollbar width and create
+   * unwanted horizontal overflow.
+   */
+  width: 100%;
+  height: 100dvh;
+
   visibility: hidden;
+
+  opacity: 0;
+
   pointer-events: none;
+
+  overflow: hidden;
+
+  isolation: isolate;
+
+  transition:
+    opacity 0.25s ease,
+    visibility 0.25s ease;
 }
 
 .site-drawer[data-open="true"] {
   visibility: visible;
+
+  opacity: 1;
+
   pointer-events: auto;
 }
 
+/* =========================================================
+   DRAWER BACKDROP
+   ========================================================= */
+
 .site-drawer-backdrop {
   position: absolute;
+
   inset: 0;
-  background: rgba(28, 25, 23, 0.4);
+
+  z-index: 0;
+
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  margin: 0;
+  padding: 0;
+
+  border: 0;
+
+  background: rgba(28, 25, 23, 0.45);
+
   opacity: 0;
+
+  cursor: pointer;
+
+  appearance: none;
+
   transition: opacity 0.3s var(--motion-ease);
 }
 
@@ -138,48 +290,124 @@
   opacity: 1;
 }
 
+/* =========================================================
+   DRAWER PANEL
+   ========================================================= */
+
 .site-drawer-panel {
   position: absolute;
+
   top: 0;
   right: 0;
+  bottom: 0;
+
+  /*
+   * Panel must be above backdrop.
+   */
+  z-index: 1;
+
   display: flex;
+
   flex-direction: column;
-  gap: 8px;
-  width: 78%;
-  max-width: 300px;
+
+  /*
+   * Mobile drawer width.
+   */
+  width: min(78vw, 320px);
+
   height: 100%;
+
+  box-sizing: border-box;
+
   padding: 24px;
+
   background: var(--cream);
-  box-shadow: -8px 0 24px -8px rgba(28, 25, 23, 0.2);
+
+  box-shadow: -8px 0 30px rgba(28, 25, 23, 0.2);
+
+  overflow-x: hidden;
+
   overflow-y: auto;
-  transform: translateX(100%);
+
+  overscroll-behavior: contain;
+
+  /*
+   * Start outside viewport.
+   */
+  transform: translate3d(100%, 0, 0);
+
   transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.3, 1);
 }
 
 .site-drawer[data-open="true"] .site-drawer-panel {
-  transform: translateX(0);
+  transform: translate3d(0, 0, 0);
 }
+
+/* =========================================================
+   DRAWER CLOSE BUTTON
+   ========================================================= */
 
 .site-drawer-close {
   align-self: flex-end;
-  margin-bottom: 8px;
-  background: none;
-  border: none;
-  font-size: 20px;
-  line-height: 1;
-  color: var(--charcoal);
-  cursor: pointer;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  width: 40px;
+  height: 40px;
+
   min-width: 40px;
   min-height: 40px;
+
+  margin: 0 0 16px;
+
+  padding: 0;
+
+  background: transparent;
+
+  border: none;
+
+  color: var(--charcoal);
+
+  font-size: 22px;
+
+  line-height: 1;
+
+  cursor: pointer;
+
+  flex: 0 0 auto;
 }
 
+.site-drawer-close:hover {
+  color: var(--saffron-deep);
+}
+
+/* =========================================================
+   DRAWER LINKS
+   ========================================================= */
+
 .site-drawer-panel a {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--charcoal);
-  text-decoration: none;
+  display: block;
+
+  width: 100%;
+
+  box-sizing: border-box;
+
   padding: 16px 0;
+
   border-bottom: 1px solid var(--line);
+
+  color: var(--charcoal);
+
+  font-size: 16px;
+
+  font-weight: 600;
+
+  text-decoration: none;
+
+  transition: color var(--motion-fast) var(--motion-ease);
 }
 
 .site-drawer-panel a:hover,
@@ -187,12 +415,27 @@
   color: var(--saffron-deep);
 }
 
+/* =========================================================
+   DRAWER CTA
+   ========================================================= */
+
 .site-drawer-cta {
+  width: 100%;
+
   margin-top: 16px;
-  text-align: center;
+
   padding: 14px 16px;
-  border-bottom: none;
+
+  border-bottom: none !important;
+
+  text-align: center;
+
+  box-sizing: border-box;
 }
+
+/* =========================================================
+   HERO
+   ========================================================= */
 
 .hero {
   padding: 80px 24px 56px;
@@ -200,70 +443,110 @@
 
 .hero-grid {
   display: grid;
+
   grid-template-columns: 1.1fr 0.9fr;
+
   gap: 56px;
+
   align-items: center;
 }
 
 .hero-eyebrow {
   display: inline-flex;
+
   align-items: center;
+
   gap: 8px;
+
   margin-bottom: 16px;
+
   font-size: 12px;
+
   font-weight: 600;
+
   letter-spacing: 0.08em;
+
   text-transform: uppercase;
+
   color: var(--saffron-deep);
 }
 
 .hero-eyebrow::before {
   content: "";
+
   width: 18px;
   height: 1px;
+
   background: var(--saffron);
 }
 
 .hero-title {
   margin: 0 0 16px;
+
   font-family: var(--font-cormorant), ui-serif, Georgia, serif;
+
   font-size: 52px;
+
   font-weight: 700;
+
   line-height: 1.05;
+
   letter-spacing: -0.02em;
+
   color: var(--charcoal);
 }
 
 .hero-title em {
   font-style: normal;
+
   color: var(--saffron-deep);
 }
 
 .hero-sub {
   max-width: 480px;
+
   margin: 0 0 32px;
+
   font-size: 17px;
+
   line-height: 1.6;
+
   color: var(--muted);
 }
 
+/* =========================================================
+   HERO CTA
+   ========================================================= */
+
 .hero-ctas {
   display: flex;
+
   flex-wrap: wrap;
+
   gap: 16px;
+
   margin-bottom: 32px;
 }
 
 .btn-primary {
   display: inline-block;
+
   background: var(--saffron);
+
   color: var(--white);
+
   padding: 16px 24px;
+
   border: none;
+
   border-radius: 10px;
+
   font-size: 14px;
+
   font-weight: 700;
+
   text-decoration: none;
+
   transition: background-color 0.15s var(--motion-ease);
 }
 
@@ -273,14 +556,23 @@
 
 .btn-ghost {
   display: inline-block;
+
   background: transparent;
+
   color: var(--charcoal);
+
   padding: 16px 24px;
+
   border: 1.5px solid var(--charcoal);
+
   border-radius: 10px;
+
   font-size: 14px;
+
   font-weight: 600;
+
   text-decoration: none;
+
   transition:
     background-color var(--motion-fast) var(--motion-ease),
     color var(--motion-fast) var(--motion-ease);
@@ -288,31 +580,45 @@
 
 .btn-ghost:hover {
   background: var(--charcoal);
+
   color: var(--cream);
 }
 
+/* =========================================================
+   HERO PROOF
+   ========================================================= */
+
 .hero-proof {
   display: flex;
+
   flex-wrap: wrap;
+
   gap: 24px;
 }
 
 .proof-item {
   font-size: 13px;
+
   color: var(--muted);
 }
 
 .proof-item strong {
   color: var(--charcoal);
+
   font-weight: 700;
 }
 
 .proof-link {
   display: inline-block;
+
   margin-top: 8px;
+
   font-size: 12px;
+
   font-weight: 600;
+
   color: var(--saffron-deep);
+
   text-decoration: none;
 }
 
@@ -320,94 +626,146 @@
   text-decoration: underline;
 }
 
+/* =========================================================
+   HERO VISUAL
+   ========================================================= */
+
 .hero-visual {
   position: relative;
+
   background: var(--white);
+
   border: 1px solid var(--line);
+
   border-radius: 12px;
+
   padding: 32px;
+
   box-shadow: 0 24px 60px -20px rgba(28, 25, 23, 0.18);
 }
 
 .hero-stitch {
   display: block;
+
   width: 100%;
   height: 20px;
+
   margin-bottom: 16px;
 }
 
 .live-badge {
   display: inline-flex;
+
   align-items: center;
+
   gap: 8px;
+
   margin-bottom: 16px;
+
   padding: 8px;
+
   border-radius: 20px;
+
   font-size: 11px;
+
   font-weight: 600;
+
   color: var(--saffron-deep);
+
   background: #fff1e0;
 }
 
 .live-dot {
   width: 6px;
   height: 6px;
+
   border-radius: 50%;
+
   background: var(--saffron);
+
   animation: live-pulse 1.8s infinite;
 }
 
 .exec-mini {
   display: flex;
+
   gap: 16px;
+
   align-items: center;
+
   padding-top: 16px;
+
   border-top: 1px dashed var(--line);
 }
 
 .exec-mini-photo {
   width: 40px;
   height: 40px;
+
   border-radius: 50%;
+
   overflow: hidden;
+
   flex: 0 0 auto;
 }
 
 .exec-mini .name {
   font-size: 13px;
+
   font-weight: 700;
+
   color: var(--charcoal);
 }
 
 .exec-mini .id {
   font-size: 11px;
+
   color: var(--muted);
 }
 
+/* =========================================================
+   FLOATING CHIPS
+   ========================================================= */
+
 .float-chip {
   position: absolute;
+
   background: var(--white);
+
   border: 1px solid var(--line);
+
   border-radius: 12px;
+
   padding: 8px 16px;
+
   font-size: 12px;
+
   font-weight: 600;
+
   color: var(--charcoal);
+
   box-shadow: 0 8px 24px -8px rgba(28, 25, 23, 0.2);
 }
 
 .float-chip-1 {
   top: 16px;
+
   left: -14px;
 }
 
 .float-chip-2 {
   bottom: 16px;
+
   right: -14px;
 }
 
+/* =========================================================
+   HERO ANIMATIONS
+   ========================================================= */
+
 .hero-enter > * {
   opacity: 0;
+
   animation: fade-up 0.7s cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
 }
 
@@ -437,55 +795,85 @@
 
 .hero-visual {
   opacity: 0;
+
   animation: scale-in 0.8s cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+
   animation-delay: 250ms;
 }
 
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
 .site-footer {
   background: var(--charcoal);
+
   color: #a8a29e;
+
   padding: 48px 24px 24px;
+
   font-size: 13px;
 }
 
 .footer-grid {
   display: grid;
+
   grid-template-columns: 1.4fr 1fr 1fr 1fr;
+
   gap: 32px;
 }
 
 .footer-logo {
   display: inline-block;
+
   font-family: var(--font-cormorant), ui-serif, Georgia, serif;
+
   font-weight: 700;
+
   color: var(--cream);
+
   font-size: 18px;
+
   margin-bottom: 8px;
+
   text-decoration: none;
 }
 
 .footer-brand p {
   margin: 8px 0 0;
+
   font-size: 12px;
+
   line-height: 1.6;
+
   color: #a8a29e;
 }
 
 .footer-col-title {
   margin: 0 0 16px;
+
   color: var(--cream);
+
   font-weight: 700;
+
   font-size: 12px;
+
   text-transform: uppercase;
+
   letter-spacing: 0.05em;
 }
 
 .footer-col a {
   display: block;
+
   min-height: 32px;
+
   padding-block: 6px;
+
   color: #a8a29e;
+
   text-decoration: none;
+
   font-size: 12px;
 }
 
@@ -495,22 +883,32 @@
 
 .footer-bottom {
   margin-top: 24px;
+
   padding-top: 16px;
+
   border-top: 1px solid #3a3532;
 }
 
 .footer-tagline {
   font-size: 11px;
+
   color: #8a8580;
 }
+
+/* =========================================================
+   KEYFRAMES
+   ========================================================= */
 
 @keyframes fade-up {
   from {
     opacity: 0;
+
     transform: translateY(18px);
   }
+
   to {
     opacity: 1;
+
     transform: translateY(0);
   }
 }
@@ -518,10 +916,13 @@
 @keyframes scale-in {
   from {
     opacity: 0;
+
     transform: scale(0.94);
   }
+
   to {
     opacity: 1;
+
     transform: scale(1);
   }
 }
@@ -531,6 +932,7 @@
   100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0.3;
   }
@@ -541,21 +943,29 @@
   100% {
     transform: rotate(0deg) translateY(0);
   }
+
   50% {
     transform: rotate(-14deg) translateY(-1px);
   }
 }
 
+/* =========================================================
+   TABLET
+   ========================================================= */
+
 @media (max-width: 1100px) {
   .hero-grid {
     grid-template-columns: 1fr;
+
     gap: 40px;
   }
 
   .float-chip-1,
   .float-chip-2 {
     position: static;
+
     display: inline-block;
+
     margin: 8px 8px 0 0;
   }
 
@@ -564,21 +974,34 @@
   }
 }
 
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
 @media (max-width: 860px) {
   .site-wrap,
   .site-nav {
     padding-inline: 16px;
   }
 
+  /*
+   * Hide desktop navigation.
+   */
   .site-nav-links,
   .site-nav-cta {
     display: none;
   }
 
+  /*
+   * Show hamburger.
+   */
   .site-hamburger {
     display: flex;
   }
 
+  /*
+   * Hero.
+   */
   .hero {
     padding: 56px 16px 40px;
   }
@@ -595,6 +1018,9 @@
     font-size: 15.5px;
   }
 
+  /*
+   * Footer.
+   */
   .footer-grid {
     grid-template-columns: 1fr 1fr;
   }
@@ -604,11 +1030,35 @@
   }
 }
 
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
 @media (max-width: 520px) {
+  .site-nav {
+    padding-top: 14px;
+
+    padding-bottom: 14px;
+  }
+
+  .site-logo {
+    font-size: 21px;
+  }
+
+  .site-drawer-panel {
+    width: min(82vw, 320px);
+
+    padding: 20px;
+  }
+
   .footer-grid {
     grid-template-columns: 1fr;
   }
 }
+
+/* =========================================================
+   MOBILE ANIMATION
+   ========================================================= */
 
 @media (max-width: 640px) {
   .hero-enter > *,
@@ -621,18 +1071,25 @@
   }
 }
 
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
 @media (prefers-reduced-motion: reduce) {
   .hero-enter > *,
   .hero-visual,
   .site-logo-mark,
   .live-dot {
     animation: none !important;
+
     opacity: 1 !important;
+
     transform: none !important;
   }
 
+  .site-drawer,
   .site-drawer-backdrop,
   .site-drawer-panel {
-    transition: none;
+    transition: none !important;
   }
 }

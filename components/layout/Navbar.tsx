@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
+
 import { diagnoseHref, primaryNav } from "@/config/navigation";
 
 function Logo({ className }: { className?: string }) {
@@ -19,30 +20,56 @@ function Logo({ className }: { className?: string }) {
 export function Navbar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+
   const drawerId = useId();
+
   const hamburgerRef = useRef<HTMLButtonElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
 
   const close = useCallback(() => {
     setOpen(false);
-    hamburgerRef.current?.focus();
+
+    // Return focus to the hamburger after the drawer closes.
+    requestAnimationFrame(() => {
+      hamburgerRef.current?.focus();
+    });
   }, []);
 
   useEffect(() => {
     if (!open) return;
 
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") close();
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        close();
+      }
     };
 
-    document.addEventListener("keydown", onKey);
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    closeRef.current?.focus();
+    document.addEventListener("keydown", onKeyDown);
+
+    /*
+     * Lock both html and body scrolling while the mobile drawer
+     * is open. This prevents the landing page from moving behind
+     * the drawer on mobile browsers.
+     */
+    const html = document.documentElement;
+    const body = document.body;
+
+    const previousHtmlOverflow = html.style.overflow;
+    const previousBodyOverflow = body.style.overflow;
+
+    html.style.overflow = "hidden";
+    body.style.overflow = "hidden";
+
+    // Move keyboard focus into the drawer.
+    requestAnimationFrame(() => {
+      closeRef.current?.focus();
+    });
 
     return () => {
-      document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", onKeyDown);
+
+      html.style.overflow = previousHtmlOverflow;
+      body.style.overflow = previousBodyOverflow;
     };
   }, [open, close]);
 
@@ -50,6 +77,8 @@ export function Navbar() {
     <header className="site-header">
       <nav className="site-nav" aria-label="Primary">
         <Logo />
+
+        {/* Desktop navigation */}
         <div className="site-nav-links">
           {primaryNav.map((item) => (
             <Link
@@ -61,9 +90,13 @@ export function Navbar() {
             </Link>
           ))}
         </div>
+
+        {/* Desktop CTA */}
         <Link className="site-nav-cta" href={diagnoseHref}>
           Fix My Garment
         </Link>
+
+        {/* Mobile hamburger */}
         <button
           ref={hamburgerRef}
           type="button"
@@ -79,13 +112,14 @@ export function Navbar() {
         </button>
       </nav>
 
+      {/* Mobile drawer */}
       <div
         className="site-drawer"
         data-open={open}
         id={drawerId}
-        inert={!open}
         aria-hidden={!open}
       >
+        {/* Dark backdrop */}
         <button
           type="button"
           className="site-drawer-backdrop"
@@ -93,12 +127,15 @@ export function Navbar() {
           tabIndex={open ? 0 : -1}
           onClick={close}
         />
+
+        {/* Drawer panel */}
         <div
           className="site-drawer-panel"
           role="dialog"
           aria-modal="true"
           aria-label="Menu"
         >
+          {/* Close button */}
           <button
             ref={closeRef}
             type="button"
@@ -108,6 +145,8 @@ export function Navbar() {
           >
             ✕
           </button>
+
+          {/* Navigation links */}
           {primaryNav.map((item) => (
             <Link
               key={item.label}
@@ -118,6 +157,8 @@ export function Navbar() {
               {item.label}
             </Link>
           ))}
+
+          {/* Drawer CTA */}
           <Link
             className="site-nav-cta site-drawer-cta"
             href={diagnoseHref}
