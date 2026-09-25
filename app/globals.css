@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "../styles/landing.css";
 
 /*
   FixFit design tokens — sourced from https://fixfit.in/style.css
@@ -7,8 +8,18 @@
 */
 
 :root {
+  /* Reference HTML tokens — landing navbar / hero / footer */
+  --charcoal: #1c1917;
+  --saffron: #f97316;
+  --saffron-deep: #c2560d;
+  --cream: #fff7ed;
+  --thread: #8b4513;
+  --line: #e7dfd3;
+  --muted: #78716c;
+  --white: #ffffff;
+
   /* Color */
-  --background: #fcf8f2;
+  --background: #fff7ed;
   --surface: #ffffff;
   --surface-elevated: #ffffff;
   --surface-muted: #e8e2d9;
@@ -191,6 +202,7 @@
   html {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    overflow-x: clip;
   }
 
   body {
@@ -369,22 +381,22 @@
 }
 
 @utility transition-fast {
-  transition-property: color, background-color, border-color, opacity, box-shadow,
-    transform;
+  transition-property:
+    color, background-color, border-color, opacity, box-shadow, transform;
   transition-duration: var(--motion-fast);
   transition-timing-function: var(--motion-ease);
 }
 
 @utility transition-normal {
-  transition-property: color, background-color, border-color, opacity, box-shadow,
-    transform;
+  transition-property:
+    color, background-color, border-color, opacity, box-shadow, transform;
   transition-duration: var(--motion-normal);
   transition-timing-function: var(--motion-ease);
 }
 
 @utility transition-slow {
-  transition-property: color, background-color, border-color, opacity, box-shadow,
-    transform;
+  transition-property:
+    color, background-color, border-color, opacity, box-shadow, transform;
   transition-duration: var(--motion-slow);
   transition-timing-function: var(--motion-ease-smooth);
 }

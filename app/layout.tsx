@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, DM_Mono, DM_Sans } from "next/font/google";
+import { Footer } from "@/components/layout/Footer";
+import { Navbar } from "@/components/layout/Navbar";
 import "./globals.css";
 import { Footer } from "@/src/components/layout/Footer";
 import { Navbar } from "@/src/components/layout/Navbar";
@@ -54,6 +56,9 @@ export default function RootLayout({
       className={`${dmSans.variable} ${cormorant.variable} ${dmMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col bg-background font-sans text-foreground">
+        <Navbar />
+        <div className="flex flex-1 flex-col">{children}</div>
+        <Footer />
       <Navbar /> <main className="flex-1">{children}</main> <Footer />
       </body>
     </html>
