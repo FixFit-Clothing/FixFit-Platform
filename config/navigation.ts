@@ -5,15 +5,15 @@ export type NavItem = {
 
 /**
  * Shared marketing navigation.
- * Hash targets are placeholders until those homepage sections/pages exist.
+ * Links used by the public site navigation.
  */
 export const primaryNav: NavItem[] = [
   { href: "/#home", label: "Home" },
-  { href: "/#estimator", label: "Estimator" },
-  { href: "/#allfixes", label: "All Fixes" },
-  { href: "/#results", label: "Real Results" },
-  { href: "/#trust", label: "Why Trust Us" },
-  { href: "/#faq", label: "FAQ" },
+  { href: "/estimator", label: "Estimator" },
+  { href: "/all-fixes", label: "All Fixes" },
+  { href: "/real-results", label: "Real Results" },
+  { href: "/why-trust-us", label: "Why Trust Us" },
+  { href: "/faq", label: "FAQ" },
 ];
 
 export const serviceLinks: NavItem[] = [
@@ -21,14 +21,14 @@ export const serviceLinks: NavItem[] = [
   { href: "/#services", label: "QuickFix" },
   { href: "/#services", label: "ScheduleFix" },
   { href: "/#pricing", label: "Pricing" },
-  { href: "/#allfixes", label: "All Fixes" },
+  { href: "/all-fixes", label: "All Fixes" },
 ];
 
 export const companyLinks: NavItem[] = [
-  { href: "/#results", label: "Real Results" },
-  { href: "/#trust", label: "Why Trust Us" },
+  { href: "/real-results", label: "Real Results" },
+  { href: "/why-trust-us", label: "Why Trust Us" },
   { href: "/#how-it-works", label: "How It Works" },
-  { href: "/#faq", label: "FAQ" },
+  { href: "/faq", label: "FAQ" },
 ];
 
 export const legalLinks: NavItem[] = [
@@ -40,4 +40,4 @@ export const legalLinks: NavItem[] = [
 /** Diagnose / booking — no dedicated route yet. */
 export const diagnoseHref = "/#diagnose";
 export const pricingHref = "/#pricing";
-export const resultsHref = "/#results";
+export const resultsHref = "/real-results";
