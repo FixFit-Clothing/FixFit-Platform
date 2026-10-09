@@ -494,7 +494,7 @@
   align-items: center;
 
   flex: 0 0 auto;
-
+  
   font-family: var(--font-cormorant), ui-serif, Georgia, serif;
 
   font-size: 22px;
@@ -509,22 +509,15 @@
   line-height: 1;
 }
 
-.site-logo-mark {
-  display: inline-block;
+.site-logo-image {
+  display: block;
 
-  margin-left: 2px;
+  width: clamp(124px, 13vw, 164px);
+  height: auto;
 
-  color: var(--saffron);
+  max-height: 52px;
 
-  font-size: 16px;
-
-  transform-origin: 50% 80%;
-
-  animation: stitch-poke 2.6s ease-in-out infinite;
-}
-
-.site-logo:hover .site-logo-mark {
-  animation-duration: 0.7s;
+  object-fit: contain;
 }
 
 /* =========================================================
@@ -1480,8 +1473,9 @@
     padding-bottom: 14px;
   }
 
-  .site-logo {
-    font-size: 21px;
+  .site-logo-image {
+    width: 118px;
+    max-height: 44px;
   }
 
   .site-drawer-panel {
@@ -1503,10 +1497,6 @@
   .hero-enter > *,
   .hero-visual {
     animation-duration: 0.4s;
-  }
-
-  .site-logo-mark {
-    animation: none;
   }
 }
 
@@ -1623,7 +1613,6 @@
 @media (prefers-reduced-motion: reduce) {
   .hero-enter > *,
   .hero-visual,
-  .site-logo-mark,
   .live-dot {
     animation: none !important;
 

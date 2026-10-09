@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
@@ -8,11 +9,20 @@ import { diagnoseHref, primaryNav } from "@/config/navigation";
 
 function Logo({ className }: { className?: string }) {
   return (
-    <Link href="/#home" className={className ?? "site-logo"}>
-      FixFit
-      <span className="site-logo-mark" aria-hidden="true">
-        ✕
-      </span>
+    <Link
+      href="/#home"
+      className={className ?? "site-logo"}
+      aria-label="FixFit home"
+    >
+      <Image
+        src="/brand/fixfit-brand-logo-nav.png"
+        alt="FixFit"
+        width={360}
+        height={180}
+        priority
+        unoptimized
+        className="site-logo-image"
+      />
     </Link>
   );
 }
