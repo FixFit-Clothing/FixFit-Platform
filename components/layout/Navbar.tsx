@@ -15,7 +15,7 @@ function Logo({ className }: { className?: string }) {
       aria-label="FixFit home"
     >
       <Image
-        src="/brand/fixfit-brand-logo-nav.png"
+        src="/brand/fixfit-navbar.webp"
         alt="FixFit"
         width={360}
         height={180}
