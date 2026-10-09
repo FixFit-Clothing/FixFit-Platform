@@ -1,0 +1,1 @@
+export { BeforeAfterCard } from "./BeforeAfterCard";

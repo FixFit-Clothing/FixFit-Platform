@@ -1,0 +1,1 @@
+export { MarketingSectionHeading } from "./MarketingSectionHeading";
