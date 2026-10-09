@@ -47,7 +47,7 @@ const proofCards = [
 
 export function RealResults() {
   return (
-    <section id="real-results" className="section bg-surface">
+    <section id="real-results" className="section">
       <div className="container">
         <MarketingSectionHeading
           eyebrow="Real Results"
