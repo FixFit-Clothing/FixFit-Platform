@@ -1,5 +1,12 @@
+export { Accordion } from "./Accordion";
+export type { AccordionItem } from "./Accordion";
 export { Button } from "./Button";
+export { BeforeAfterCard } from "./BeforeAfterCard";
 export { Container } from "./Container";
 export { Heading } from "./Heading/Heading";
+export { MarketingSectionHeading } from "./MarketingSectionHeading";
+export { ProofCard } from "./ProofCard";
 export { SectionTitle } from "./SectionTitle";
+export { StatisticItem } from "./StatisticItem";
 export { Text } from "./Text";
+export { TrustCard } from "./TrustCard";

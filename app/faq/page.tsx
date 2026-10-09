@@ -1,13 +1,9 @@
-import { CircleHelp } from "lucide-react";
-import { MarketingPlaceholderPage } from "@/components/marketing/MarketingPlaceholderPage";
+import { FAQ } from "@/components/home/FAQ";
 
 export default function FaqPage() {
   return (
-    <MarketingPlaceholderPage
-      eyebrow="Support"
-      icon={CircleHelp}
-      title="Frequently asked questions"
-      description="Answers about booking, turnaround times, garment care, and how FixFit works will appear here."
-    />
+    <main>
+      <FAQ />
+    </main>
   );
 }
