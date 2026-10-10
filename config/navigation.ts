@@ -34,9 +34,9 @@ export const companyLinks: NavItem[] = [
 ];
 
 export const legalLinks: NavItem[] = [
-  { href: "/#privacy", label: "Privacy Policy" },
-  { href: "/#terms", label: "Terms of Service" },
-  { href: "/#refund", label: "Refund Policy" },
+  { href: "/privacy-policy", label: "Privacy Policy" },
+  { href: "/terms-and-conditions", label: "Terms of Service" },
+  { href: "/refund-policy", label: "Refund Policy" },
 ];
 
 /** Diagnose / booking — no dedicated route yet. */
