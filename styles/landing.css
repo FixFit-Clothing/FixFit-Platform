@@ -217,6 +217,497 @@
   background: var(--saffron);
 }
 
+/* =========================================================
+   ESTIMATOR
+   ========================================================= */
+
+.estimator-page {
+  padding-block: 56px 72px;
+}
+
+.estimator-shell {
+  max-width: 920px;
+}
+
+.estimator-header {
+  margin-bottom: 20px;
+}
+
+.estimator-coverage,
+.estimator-actions,
+.estimator-cart-item,
+.estimator-summary p {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.estimator-coverage,
+.estimator-note {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.estimator-coverage button {
+  padding: 0;
+  color: var(--saffron-deep);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.estimator-progress {
+  display: flex;
+  align-items: center;
+  margin: 28px 0;
+}
+
+.estimator-progress button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  color: var(--muted);
+  background: none;
+  border: 0;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.estimator-progress button:not(:last-child)::after {
+  width: clamp(20px, 8vw, 88px);
+  height: 1px;
+  margin-left: 8px;
+  background: var(--line);
+  content: "";
+}
+
+.estimator-progress span {
+  display: grid;
+  width: 26px;
+  height: 26px;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  font-size: 11px;
+}
+
+.estimator-progress .active,
+.estimator-progress button:not(:disabled) {
+  color: var(--charcoal);
+}
+
+.estimator-progress .active span {
+  color: var(--cream);
+  background: var(--charcoal);
+  border-color: var(--charcoal);
+}
+
+.estimator-panel,
+.estimator-confirmation {
+  padding: 24px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+}
+
+.estimator-stage {
+  margin: 0 0 16px;
+  color: var(--saffron-deep);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.estimator-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.estimator-chips button,
+.estimator-tabs button,
+.estimator-secondary,
+.estimator-primary {
+  border-radius: 999px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.estimator-chips button,
+.estimator-tabs button,
+.estimator-secondary {
+  padding: 8px 12px;
+  color: var(--charcoal);
+  background: var(--cream);
+  border: 1px solid var(--line);
+}
+
+.estimator-chips button.selected,
+.estimator-tabs button.active {
+  color: var(--cream);
+  background: var(--charcoal);
+  border-color: var(--charcoal);
+}
+
+.estimator-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.estimator-actions {
+  margin-top: 24px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.estimator-primary {
+  padding: 10px 16px;
+  color: var(--white);
+  background: var(--saffron);
+  border: 1px solid var(--saffron);
+}
+
+.estimator-primary:hover {
+  background: var(--saffron-deep);
+}
+
+.estimator-primary:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.estimator-search,
+.estimator-field {
+  display: grid;
+  gap: 6px;
+  margin: 16px 0;
+  color: var(--charcoal);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.estimator-photo-box {
+  margin-top: 20px;
+}
+
+.estimator-photo-box > p {
+  margin: 0 0 8px;
+  color: var(--charcoal);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.estimator-photo-box > p strong {
+  color: #b42318;
+}
+
+.estimator-photo-box > input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.estimator-photo-drop {
+  display: grid;
+  min-height: 112px;
+  place-items: center;
+  padding: 16px;
+  color: var(--charcoal);
+  background: var(--cream);
+  border: 1.5px dashed var(--saffron);
+  border-radius: 12px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.estimator-photo-drop span {
+  color: var(--saffron-deep);
+  font-size: 25px;
+}
+
+.estimator-photo-drop strong {
+  margin-top: 4px;
+  font-size: 13px;
+}
+
+.estimator-photo-drop small {
+  max-width: 420px;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.estimator-photo-preview {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 12px;
+  background: var(--cream);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.estimator-photo-preview img,
+.estimator-cart-photo {
+  width: 64px;
+  height: 64px;
+  flex: 0 0 auto;
+  object-fit: cover;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.estimator-photo-preview > div {
+  display: grid;
+  gap: 3px;
+}
+
+.estimator-photo-preview strong {
+  color: #15803d;
+  font-size: 12px;
+}
+
+.estimator-photo-preview span {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.estimator-photo-preview label,
+.estimator-photo-preview button {
+  margin-right: 12px;
+  padding: 0;
+  color: var(--saffron-deep);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  text-decoration: underline;
+}
+
+.estimator-cart-photo {
+  width: 44px;
+  height: 44px;
+}
+
+.estimator-search input,
+.estimator-field input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 11px 12px;
+  color: var(--charcoal);
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font: inherit;
+  font-size: 13px;
+}
+
+.estimator-search input:focus,
+.estimator-field input:focus,
+.estimator-chips button:focus-visible,
+.estimator-primary:focus-visible,
+.estimator-secondary:focus-visible {
+  outline: 2px solid var(--saffron);
+  outline-offset: 2px;
+}
+
+.estimator-issue-list {
+  max-height: 188px;
+  overflow-y: auto;
+}
+
+.estimator-options,
+.estimator-basket,
+.estimator-tiers,
+.estimator-cart,
+.estimator-summary,
+.estimator-payment {
+  margin-top: 16px;
+}
+
+.estimator-options > strong {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+.estimator-options .estimator-secondary {
+  margin-top: 12px;
+}
+
+.estimator-basket > div,
+.estimator-cart-item {
+  margin-top: 8px;
+  padding: 12px;
+  background: var(--cream);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.estimator-basket > div {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.estimator-basket span {
+  padding: 2px 6px;
+  color: #6b3fa0;
+  background: #eee4f7;
+  border-radius: 99px;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.estimator-basket p,
+.estimator-cart-item p {
+  flex: 1;
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.estimator-basket button,
+.estimator-cart-item > button {
+  color: var(--saffron-deep);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 1;
+}
+
+.estimator-tiers,
+.estimator-payment {
+  display: grid;
+  gap: 8px;
+  padding: 0;
+  border: 0;
+}
+
+.estimator-tiers legend,
+.estimator-payment legend {
+  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.estimator-tiers label,
+.estimator-payment label {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.estimator-tiers label span {
+  color: var(--muted);
+}
+
+.estimator-summary {
+  padding: 16px;
+  color: var(--cream);
+  background: var(--charcoal);
+  border-radius: 12px;
+}
+
+.estimator-summary p {
+  margin: 0;
+  padding: 7px 0;
+  font-size: 13px;
+}
+
+.estimator-summary .total {
+  color: var(--saffron);
+  border-top: 1px solid #4a4541;
+  font-family: var(--font-cormorant), ui-serif, Georgia, serif;
+  font-size: 20px;
+}
+
+.estimator-summary small {
+  color: #d6d3d1;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.estimator-cart h2 {
+  margin: 0 0 8px;
+  font-size: 15px;
+}
+
+.estimator-cart-item small {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.estimator-cart-item label {
+  font-size: 11px;
+}
+
+.estimator-error {
+  margin: 16px 0 0;
+  color: #b42318;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.estimator-confirmation {
+  max-width: 680px;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.estimator-confirmation p {
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+@media (max-width: 640px) {
+  .estimator-page {
+    padding-block: 40px;
+  }
+
+  .estimator-panel,
+  .estimator-confirmation {
+    padding: 16px;
+  }
+
+  .estimator-coverage,
+  .estimator-actions,
+  .estimator-cart-item,
+  .estimator-summary p {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .estimator-progress button {
+    gap: 4px;
+    font-size: 10px;
+  }
+}
+
 .promise-card {
   padding: 44px 36px 28px;
   background: var(--white);

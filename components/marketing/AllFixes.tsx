@@ -4,6 +4,7 @@ type Fix = {
   id: string;
   title: string;
   description: string;
+  estimatorHref?: string;
 };
 
 // Mirrors the complete FIX_CATALOG in the supplied FixFit reference page.
@@ -12,21 +13,26 @@ const fixes: Fix[] = [
     id: "broken-zip-repair",
     title: "Broken Zip Repair",
     description: "Zip replacement, HSR Layout — from ₹299, same-day.",
+    estimatorHref:
+      "/estimator?garment=Dress&issue=Missing%20Zip&category=replacement",
   },
   {
     id: "blouse-alteration",
     title: "Blouse Alteration",
     description: "Fit, sleeve, hook & fall — from ₹599.",
+    estimatorHref: "/estimator?garment=Blouse&issue=Tight&category=alteration",
   },
   {
     id: "dress-alteration",
     title: "Dress Alteration",
     description: "Take in, let out, hem — from ₹499.",
+    estimatorHref: "/estimator?garment=Dress&issue=Loose&category=alteration",
   },
   {
     id: "gown-lehenga-alteration",
     title: "Gown & Lehenga Alteration",
     description: "Fall, edging, fitting — from ₹349.",
+    estimatorHref: "/estimator?garment=Gown&issue=Loose&category=alteration",
   },
   {
     id: "torn-seam-repair",
@@ -37,21 +43,26 @@ const fixes: Fix[] = [
     id: "sleeve-shortening",
     title: "Sleeve Shortening",
     description: "Precise length matching — from ₹199.",
+    estimatorHref: "/estimator?garment=Blouse&issue=Short&category=alteration",
   },
   {
     id: "waist-adjustment",
     title: "Waist Adjustment",
     description: "Trousers, salwar, skirts — from ₹249.",
+    estimatorHref: "/estimator?garment=Trouser&issue=Tight&category=alteration",
   },
   {
     id: "hook-button-repair",
     title: "Hook/Button Repair",
     description: "Any garment, on the spot — from ₹99.",
+    estimatorHref:
+      "/estimator?garment=Blouse&issue=Missing%20Hooks&category=replacement",
   },
   {
     id: "same-day-alteration",
     title: "Same-Day Alteration",
     description: "Scheduled, no rush — book ahead in HSR Layout.",
+    estimatorHref: "/estimator?tier=schedule",
   },
   {
     id: "emergency-tailor-hsr-layout",
@@ -114,7 +125,7 @@ export function AllFixes() {
                 <p>{fix.description}</p>
                 <Link
                   className="all-fixes-cta"
-                  href="/estimator"
+                  href={fix.estimatorHref ?? "/estimator"}
                   aria-label={`Book ${fix.title}`}
                 >
                   Book Now <span aria-hidden="true">→</span>
