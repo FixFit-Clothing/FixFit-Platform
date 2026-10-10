@@ -8,7 +8,9 @@ export type NavItem = {
  * Links used by the public site navigation.
  */
 export const primaryNav: NavItem[] = [
-  { href: "/#home", label: "Home" },
+  // The home page does not expose a `#home` anchor. Use the canonical route so
+  // repeated clicks cannot accumulate a fragment in the URL.
+  { href: "/", label: "Home" },
   { href: "/estimator", label: "Estimator" },
   { href: "/all-fixes", label: "All Fixes" },
   { href: "/real-results", label: "Real Results" },

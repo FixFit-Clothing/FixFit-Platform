@@ -494,7 +494,7 @@
   align-items: center;
 
   flex: 0 0 auto;
-  
+
   font-family: var(--font-cormorant), ui-serif, Georgia, serif;
 
   font-size: 22px;
@@ -863,6 +863,8 @@
   text-align: center;
 
   box-sizing: border-box;
+
+  color: var(--cream) !important;
 }
 
 /* =========================================================
