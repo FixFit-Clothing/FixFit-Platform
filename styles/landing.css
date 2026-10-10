@@ -111,6 +111,112 @@
   color: var(--charcoal);
 }
 
+/* =========================================================
+   ALL FIXES
+   ========================================================= */
+
+.all-fixes-page {
+  padding-block: 72px;
+}
+
+.all-fixes-header {
+  margin-bottom: 16px;
+}
+
+.all-fixes-intro {
+  margin: 0 0 16px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.all-fixes-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.all-fixes-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  transition:
+    transform 0.2s cubic-bezier(0.2, 0.7, 0.3, 1),
+    box-shadow 0.2s,
+    border-color 0.2s;
+}
+
+.all-fixes-card:hover {
+  border-color: var(--saffron);
+  box-shadow: 0 16px 32px -16px rgba(28, 25, 23, 0.24);
+  transform: translateY(-4px);
+}
+
+.all-fixes-image {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 120px;
+  color: var(--saffron-deep);
+  background: var(--cream);
+  border-bottom: 1px dashed var(--line);
+}
+
+.all-fixes-image span {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  padding: 2px 8px;
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 8px;
+  font-size: 9px;
+}
+
+.all-fixes-card-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 16px;
+}
+
+.all-fixes-card h2 {
+  margin: 0 0 8px;
+  color: var(--charcoal);
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.all-fixes-card p {
+  margin: 0 0 16px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.all-fixes-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  margin-top: auto;
+  padding: 8px 16px;
+  color: var(--cream);
+  background: var(--charcoal);
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background-color var(--motion-fast) var(--motion-ease);
+}
+
+.all-fixes-card:hover .all-fixes-cta {
+  background: var(--saffron);
+}
+
 .promise-card {
   padding: 44px 36px 28px;
   background: var(--white);
@@ -1477,6 +1583,14 @@
     padding-inline: 16px;
   }
 
+  .all-fixes-page {
+    padding-block: 48px;
+  }
+
+  .all-fixes-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   /*
    * Hide desktop navigation.
    */
@@ -1543,6 +1657,10 @@
     width: min(82vw, 320px);
 
     padding: 20px;
+  }
+
+  .all-fixes-grid {
+    grid-template-columns: 1fr;
   }
 
   .footer-grid {

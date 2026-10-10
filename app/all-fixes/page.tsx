@@ -1,13 +1,12 @@
-import { Scissors } from "lucide-react";
-import { MarketingPlaceholderPage } from "@/components/marketing/MarketingPlaceholderPage";
+import type { Metadata } from "next";
+import { AllFixes } from "@/components/marketing/AllFixes";
+
+export const metadata: Metadata = {
+  title: "All Fixes",
+  description:
+    "Explore every garment repair, alteration, and clothing emergency FixFit handles in HSR Layout.",
+};
 
 export default function AllFixesPage() {
-  return (
-    <MarketingPlaceholderPage
-      eyebrow="Services"
-      icon={Scissors}
-      title="All fixes"
-      description="Explore every repair, alteration, and clothing emergency FixFit can help solve."
-    />
-  );
+  return <AllFixes />;
 }
