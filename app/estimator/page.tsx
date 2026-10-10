@@ -1,13 +1,28 @@
-import { Calculator } from "lucide-react";
-import { MarketingPlaceholderPage } from "@/components/marketing/MarketingPlaceholderPage";
+import type { Metadata } from "next";
+import { Estimator } from "@/components/marketing/Estimator";
 
-export default function EstimatorPage() {
+export const metadata: Metadata = {
+  title: "Fix Estimator",
+  description: "Build a FixFit garment-fix estimate and preview your visit.",
+};
+
+export default async function EstimatorPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const query = await searchParams;
+  const value = (name: string) => {
+    const parameter = query[name];
+    return typeof parameter === "string" ? parameter : undefined;
+  };
+
   return (
-    <MarketingPlaceholderPage
-      eyebrow="Plan your fix"
-      icon={Calculator}
-      title="Fix estimator"
-      description="Tell us about your garment and the repair you need. This page will guide you through the details needed to prepare your estimate."
+    <Estimator
+      initialCategory={value("category")}
+      initialGarment={value("garment")}
+      initialIssue={value("issue")}
+      initialTier={value("tier")}
     />
   );
 }

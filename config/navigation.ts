@@ -39,7 +39,7 @@ export const legalLinks: NavItem[] = [
   { href: "/refund-policy", label: "Refund Policy" },
 ];
 
-/** Diagnose / booking — no dedicated route yet. */
-export const diagnoseHref = "/#diagnose";
+/** Diagnose / booking lives on the dedicated estimator route. */
+export const diagnoseHref = "/estimator";
 export const pricingHref = "/#pricing";
 export const resultsHref = "/real-results";
