@@ -52,6 +52,65 @@
   line-height: 1.08;
 }
 
+/* =========================================================
+   LEGAL PAGES
+   ========================================================= */
+
+.legal-page {
+  padding-block: 72px;
+}
+
+.legal-page-content {
+  max-width: 808px;
+}
+
+.legal-page-header {
+  margin-bottom: 40px;
+}
+
+.legal-page-summary {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.legal-body {
+  color: var(--charcoal);
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+.legal-body h2 {
+  margin: 32px 0 8px;
+  color: var(--saffron-deep);
+  font-family: var(--font-dm-sans), ui-sans-serif, sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.legal-body h2:first-child {
+  margin-top: 0;
+}
+
+.legal-body p,
+.legal-body ul {
+  margin: 0 0 16px;
+}
+
+.legal-body ul {
+  padding-left: 16px;
+}
+
+.legal-body li {
+  margin-bottom: 8px;
+}
+
+.legal-body strong {
+  color: var(--charcoal);
+}
+
 .promise-card {
   padding: 44px 36px 28px;
   background: var(--white);
