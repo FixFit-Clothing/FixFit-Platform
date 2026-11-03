@@ -424,6 +424,31 @@
   font-size: 12px;
 }
 
+.estimator-draft-message {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 10px 12px;
+  color: #475569;
+  background: #f8fafc;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+.estimator-draft-message button {
+  padding: 0;
+  color: var(--saffron-deep);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+}
+
 .estimator-coverage button {
   padding: 0;
   color: var(--saffron-deep);
@@ -859,6 +884,79 @@
   line-height: 1.7;
 }
 
+.checkout-page {
+  padding-block: 56px 72px;
+}
+
+.checkout-shell {
+  max-width: 760px;
+}
+
+.checkout-header > p:last-child,
+.checkout-empty > p {
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.checkout-card {
+  padding: 24px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+}
+
+.checkout-card h2 {
+  margin: 0;
+  color: var(--charcoal);
+  font-size: 17px;
+}
+
+.checkout-empty {
+  max-width: 620px;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.checkout-details {
+  display: grid;
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.checkout-details div {
+  padding: 12px;
+  background: var(--cream);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.checkout-details dt {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.checkout-details dd {
+  margin: 4px 0 0;
+  color: var(--charcoal);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.checkout-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-top: 24px;
+}
+
+.checkout-actions .estimator-primary {
+  text-decoration: none;
+}
+
 @media (max-width: 640px) {
   .estimator-page {
     padding-block: 40px;
@@ -873,6 +971,11 @@
   .estimator-actions,
   .estimator-cart-item,
   .estimator-summary p {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .estimator-draft-message {
     align-items: flex-start;
     flex-direction: column;
   }

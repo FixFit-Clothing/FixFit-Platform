@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, DM_Mono, DM_Sans } from "next/font/google";
+import { Toaster } from "sonner";
 import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
 import "./globals.css";
@@ -57,6 +58,7 @@ export default function RootLayout({
         <Navbar />
         <div className="flex flex-1 flex-col">{children}</div>
         <Footer />
+        <Toaster position="top-center" richColors />
       </body>
     </html>
   );
