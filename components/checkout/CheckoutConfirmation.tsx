@@ -5,6 +5,8 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
+import { CheckoutCustomerDetails } from "@/components/checkout/CheckoutCustomerDetails";
+
 import {
   clearBookingDraft,
   getCurrentEstimate,
@@ -189,6 +191,8 @@ export function CheckoutConfirmation({
               </div>
             ) : null}
           </dl>
+
+          <CheckoutCustomerDetails draft={draft} onDraftUpdated={setDraft} />
 
           <div className="checkout-actions">
             <Link className="estimator-primary" href="/estimator">

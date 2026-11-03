@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { SignOutButton } from "@/components/auth/SignOutButton";
+import { CustomerProfileAndAddresses } from "@/components/account/CustomerProfileAndAddresses";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -42,8 +43,8 @@ export default async function AccountPage({
             You’re signed in
           </h1>
           <p className="account-description">
-            Signed in as <strong>{email}</strong>. Booking and profile details
-            will be added in a later phase.
+            Signed in as <strong>{email}</strong>. Manage your booking contact
+            details and pickup addresses below.
           </p>
           {query.auth === "success" ? (
             <p className="auth-message" role="status">
@@ -51,6 +52,7 @@ export default async function AccountPage({
             </p>
           ) : null}
           <SignOutButton className="btn-primary auth-submit" />
+          <CustomerProfileAndAddresses />
           <section
             className="account-history"
             aria-labelledby="order-history-title"
