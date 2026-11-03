@@ -6,7 +6,7 @@ import { LoginForm } from "./LoginForm";
 
 export const metadata: Metadata = {
   title: "Sign in",
-  description: "Sign in to your FixFit customer account with an email link.",
+  description: "Sign in to your FixFit customer account.",
 };
 
 export default async function LoginPage({
@@ -22,7 +22,7 @@ export default async function LoginPage({
   return (
     <main className="auth-page">
       <div className="site-wrap auth-page-content">
-        <LoginForm next={next} callbackFailed={query.error === "magic-link"} />
+        <LoginForm next={next} callbackFailed={query.error === "email-link"} />
       </div>
     </main>
   );

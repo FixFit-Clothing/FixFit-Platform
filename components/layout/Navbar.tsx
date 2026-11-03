@@ -12,7 +12,9 @@ import {
   type MouseEvent,
 } from "react";
 
+import { SignOutButton } from "@/components/auth/SignOutButton";
 import { diagnoseHref, primaryNav } from "@/config/navigation";
+import { createClient } from "@/lib/supabase/client";
 
 function Logo({ className }: { className?: string }) {
   return (
@@ -37,11 +39,35 @@ function Logo({ className }: { className?: string }) {
 export function Navbar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const drawerId = useId();
 
   const hamburgerRef = useRef<HTMLButtonElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const supabase = createClient();
+    let mounted = true;
+
+    async function loadAuthenticationState() {
+      const { data, error } = await supabase.auth.getClaims();
+      if (mounted) setIsAuthenticated(!error && Boolean(data?.claims?.sub));
+    }
+
+    void loadAuthenticationState();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (mounted) setIsAuthenticated(Boolean(session?.user));
+    });
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, []);
 
   const close = useCallback((restoreFocus = false) => {
     setOpen(false);
@@ -126,10 +152,28 @@ export function Navbar() {
             ))}
           </div>
 
-          {/* Desktop CTA */}
-          <Link className="site-nav-cta" href={diagnoseHref}>
-            Fix My Garment
-          </Link>
+          <div className="site-nav-actions">
+            {isAuthenticated ? (
+              <>
+                <Link className="site-auth-link" href="/account">
+                  My Account
+                </Link>
+                <SignOutButton className="site-auth-button" />
+              </>
+            ) : (
+              <>
+                <Link className="site-auth-link" href="/login">
+                  Login
+                </Link>
+                <Link className="site-auth-link" href="/signup">
+                  Create Account
+                </Link>
+              </>
+            )}
+            <Link className="site-nav-cta" href={diagnoseHref}>
+              Fix My Garment
+            </Link>
+          </div>
 
           {/* Mobile hamburger */}
           <button
@@ -201,6 +245,29 @@ export function Navbar() {
               {item.label}
             </Link>
           ))}
+
+          <div className="site-drawer-auth">
+            {isAuthenticated ? (
+              <>
+                <Link href="/account" onClick={() => close()}>
+                  My Account
+                </Link>
+                <SignOutButton
+                  className="site-drawer-auth-button"
+                  onSignedOut={() => close()}
+                />
+              </>
+            ) : (
+              <>
+                <Link href="/login" onClick={() => close()}>
+                  Login
+                </Link>
+                <Link href="/signup" onClick={() => close()}>
+                  Create Account
+                </Link>
+              </>
+            )}
+          </div>
 
           {/* Drawer CTA */}
           <Link

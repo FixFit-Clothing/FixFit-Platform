@@ -5,24 +5,49 @@ import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
-/** Exchanges a Supabase PKCE magic-link code for cookie-backed session data. */
+type AuthFlow = "magic" | "signup" | "recovery";
+
+function getFlow(value: string | null): AuthFlow {
+  if (value === "signup" || value === "recovery") return value;
+  return "magic";
+}
+
+/** Exchanges a Supabase PKCE email-flow code for cookie-backed session data. */
 export async function GET(request: NextRequest) {
   const code = request.nextUrl.searchParams.get("code");
   const next = getSafeRedirectPath(request.nextUrl.searchParams.get("next"));
+  const flow = getFlow(request.nextUrl.searchParams.get("flow"));
 
   if (code) {
     const supabase = await createClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!error) {
-      const destination = new URL(next, request.url);
-      destination.searchParams.set("auth", "success");
+      const destination = new URL(
+        flow === "recovery" ? "/password/setup" : next,
+        request.url
+      );
+
+      if (flow === "recovery") {
+        destination.searchParams.set("next", next);
+        destination.searchParams.set("recovery", "ready");
+      } else {
+        destination.searchParams.set("auth", "success");
+      }
+
       return NextResponse.redirect(destination);
     }
   }
 
-  const login = new URL("/login", request.url);
-  login.searchParams.set("error", "magic-link");
-  login.searchParams.set("next", next);
-  return NextResponse.redirect(login);
+  const failure = new URL(
+    flow === "recovery"
+      ? "/forgot-password"
+      : flow === "signup"
+        ? "/signup"
+        : "/login",
+    request.url
+  );
+  failure.searchParams.set("error", "email-link");
+  failure.searchParams.set("next", next);
+  return NextResponse.redirect(failure);
 }

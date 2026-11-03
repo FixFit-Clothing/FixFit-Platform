@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
-import { signOut } from "./actions";
+import { SignOutButton } from "@/components/auth/SignOutButton";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -50,11 +50,7 @@ export default async function AccountPage({
               You&apos;re signed in successfully.
             </p>
           ) : null}
-          <form action={signOut}>
-            <button className="btn-primary auth-submit" type="submit">
-              Sign out
-            </button>
-          </form>
+          <SignOutButton className="btn-primary auth-submit" />
           <section
             className="account-history"
             aria-labelledby="order-history-title"
