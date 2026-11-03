@@ -1,6 +1,15 @@
 "use client";
 
 import { type ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import {
+  clearBookingDraft,
+  createBookingDraft,
+  loadBookingDraft,
+  saveBookingDraft,
+  type BookingDraftCartItem,
+  type BookingDraftIssue,
+} from "@/lib/booking-draft";
 import {
   allowsMultipleOptions,
   garmentTags,
@@ -14,21 +23,10 @@ import {
 } from "@/lib/estimator-data";
 import { calculateEstimate } from "@/lib/estimator-pricing";
 import { processGarmentPhoto, type GarmentPhoto } from "@/lib/estimator-photo";
+import { createClient } from "@/lib/supabase/client";
 
-type SelectedIssue = {
-  category: IssueCategory;
-  issue: string;
-  options: string[];
-};
-
-type EstimatorCartItem = {
-  id: string;
-  garment: string;
-  issues: SelectedIssue[];
-  tier: ServiceTier;
-  rush: boolean;
-  photo: GarmentPhoto;
-};
+type SelectedIssue = BookingDraftIssue;
+type EstimatorCartItem = BookingDraftCartItem;
 
 type EstimatorProps = {
   initialGarment?: string;
@@ -56,6 +54,7 @@ export function Estimator({
   initialCategory,
   initialTier,
 }: EstimatorProps) {
+  const router = useRouter();
   const [guides, setGuides] = useState<GuideMap>({});
   const [step, setStep] = useState(1);
   const [garment, setGarment] = useState(
@@ -86,12 +85,38 @@ export function Estimator({
   const [paymentMethod, setPaymentMethod] = useState<"UPI" | "Card">("UPI");
   const [error, setError] = useState("");
   const [coverageMessage, setCoverageMessage] = useState("");
-  const [confirmed, setConfirmed] = useState(false);
+  const [isContinuing, setIsContinuing] = useState(false);
+  const [draftMessage, setDraftMessage] = useState("");
 
   useEffect(() => {
     loadGuides()
       .then(setGuides)
       .catch(() => setError("Could not load fix options."));
+  }, []);
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      const result = loadBookingDraft();
+
+      if (result.status === "ready") {
+        setCart(result.draft.cart);
+        setAddress(result.draft.address);
+        setLandmark(result.draft.landmark);
+        setPaymentMethod(result.draft.paymentMethod);
+        setStep(3);
+        setDraftMessage("Your saved booking draft has been restored.");
+      } else if (result.status === "expired") {
+        setDraftMessage(
+          "Your saved booking draft has expired. You can discard it and start a new one."
+        );
+      } else if (result.status === "invalid") {
+        setDraftMessage(
+          "We could not restore the saved booking draft. You can discard it and start a new one."
+        );
+      }
+    }, 0);
+
+    return () => window.clearTimeout(timeout);
   }, []);
 
   const guideRows = useMemo(() => {
@@ -203,7 +228,7 @@ export function Estimator({
     setStep(1);
   }
 
-  function completeDemoBooking() {
+  async function continueToBooking() {
     if (!cart.length) {
       setError("Add at least one garment to your visit.");
       return;
@@ -212,11 +237,43 @@ export function Estimator({
       setError("Enter your pickup address to continue.");
       return;
     }
+
+    const draft = createBookingDraft({
+      cart,
+      address: address.trim(),
+      landmark: landmark.trim(),
+      paymentMethod,
+      estimate,
+    });
+    const saved = saveBookingDraft(draft);
+
+    if (!saved.ok) {
+      setError(saved.error);
+      return;
+    }
+
     setError("");
-    setConfirmed(true);
+    setIsContinuing(true);
+
+    try {
+      const supabase = createClient();
+      const { data, error: claimsError } = await supabase.auth.getClaims();
+
+      if (!claimsError && data?.claims?.sub) {
+        router.push("/checkout/confirm");
+        return;
+      }
+
+      router.push("/login?next=%2Fcheckout%2Fconfirm");
+    } catch {
+      router.push("/login?next=%2Fcheckout%2Fconfirm");
+    } finally {
+      setIsContinuing(false);
+    }
   }
 
   function startFreshDraft() {
+    clearBookingDraft();
     setCart([]);
     setGarment("");
     setAlterationIssue("");
@@ -224,37 +281,8 @@ export function Estimator({
     setPhoto(null);
     setAddress("");
     setLandmark("");
-    setConfirmed(false);
+    setDraftMessage("");
     setStep(1);
-  }
-
-  if (confirmed) {
-    return (
-      <main className="estimator-page">
-        <section className="site-wrap estimator-shell">
-          <div className="estimator-confirmation">
-            <p className="section-eyebrow">Demo booking preview</p>
-            <h1 className="section-title">Your draft is ready to review.</h1>
-            <p>
-              This frontend preview has not created a booking, processed a
-              payment, assigned an executive, or generated live tracking.
-            </p>
-            <p>
-              Draft reference: <strong>DEMO-{cart.length}GARMENT</strong> ·{" "}
-              {address}
-              {landmark ? ` · ${landmark}` : ""}
-            </p>
-            <button
-              className="estimator-primary"
-              onClick={startFreshDraft}
-              type="button"
-            >
-              Start a fresh draft
-            </button>
-          </div>
-        </section>
-      </main>
-    );
   }
 
   return (
@@ -282,6 +310,14 @@ export function Estimator({
             Check if we cover your area
           </button>
         </div>
+        {draftMessage ? (
+          <div className="estimator-draft-message" role="status">
+            <span>{draftMessage}</span>
+            <button onClick={startFreshDraft} type="button">
+              Discard saved draft
+            </button>
+          </div>
+        ) : null}
         {coverageMessage && <p className="estimator-note">{coverageMessage}</p>}
         <div className="estimator-progress" aria-label={`Step ${step} of 3`}>
           {["Garment", "Problem", "Review & book"].map((label, index) => (
@@ -713,10 +749,13 @@ export function Estimator({
               </button>
               <button
                 className="estimator-primary"
-                onClick={completeDemoBooking}
+                disabled={isContinuing}
+                onClick={() => void continueToBooking()}
                 type="button"
               >
-                Preview booking — ₹{estimate.payNow} →
+                {isContinuing
+                  ? "Saving your draft…"
+                  : `Continue to booking — ₹${estimate.payNow} →`}
               </button>
             </div>
           </section>
