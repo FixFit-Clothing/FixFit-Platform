@@ -2,6 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
+import { OrderPaymentPanel } from "@/components/orders/OrderPaymentPanel";
+import {
+  getCustomerOrderStatus,
+  getOrderStatusLabel,
+  getPaymentStatusLabel,
+  type PaymentStatus,
+} from "@/lib/customer-order-status";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -37,6 +44,9 @@ type CustomerOrder = {
   booking_fee_amount: number;
   rush_fee_amount: number;
   final_payable_amount: number | null;
+  payment_status: PaymentStatus;
+  payment_rejection_reason: string | null;
+  design_executive_name: string | null;
   pickup_address_line1_snapshot: string | null;
   pickup_landmark_snapshot: string | null;
   pickup_locality_snapshot: string | null;
@@ -56,32 +66,6 @@ function formatMoney(amount: number) {
     currency: "INR",
     maximumFractionDigits: 0,
   }).format(amount);
-}
-
-function getOrderStatusCopy(status: string) {
-  if (status === "confirmed") {
-    return {
-      eyebrow: "Booking confirmed",
-      title: "Your FixFit booking is confirmed",
-      detail:
-        "Your booking has been confirmed. Design-executive allocation will be shared when available.",
-    };
-  }
-
-  if (status === "cancelled") {
-    return {
-      eyebrow: "Booking cancelled",
-      title: "This FixFit booking was cancelled",
-      detail: "This booking is no longer active.",
-    };
-  }
-
-  return {
-    eyebrow: "Booking created",
-    title: "Your FixFit booking has been created",
-    detail:
-      "We received your booking. We’ll share the next step when it is ready.",
-  };
 }
 
 function formatCategory(category: string) {
@@ -115,6 +99,9 @@ export default async function CustomerOrderConfirmationPage({
         booking_fee_amount,
         rush_fee_amount,
         final_payable_amount,
+        payment_status,
+        payment_rejection_reason,
+        design_executive_name,
         pickup_address_line1_snapshot,
         pickup_landmark_snapshot,
         pickup_locality_snapshot,
@@ -145,7 +132,11 @@ export default async function CustomerOrderConfirmationPage({
   if (error || !data) notFound();
   const order = data as CustomerOrder;
   const initialPayable = order.booking_fee_amount + order.rush_fee_amount;
-  const statusCopy = getOrderStatusCopy(order.status);
+  const statusCopy = getCustomerOrderStatus({
+    orderStatus: order.status,
+    paymentStatus: order.payment_status,
+    designExecutiveName: order.design_executive_name,
+  });
   const pickupAddress = [
     order.pickup_address_line1_snapshot,
     order.pickup_locality_snapshot,
@@ -161,15 +152,26 @@ export default async function CustomerOrderConfirmationPage({
         aria-labelledby="order-title"
       >
         <header className="section-head checkout-header">
-          <p className="section-eyebrow">{statusCopy.eyebrow}</p>
+          <p className="section-eyebrow">Booking status</p>
           <h1 className="section-title" id="order-title">
-            {statusCopy.title}
+            {statusCopy.label}
           </h1>
           <p>
             Reference <strong>{order.order_reference}</strong> · Created{" "}
             {new Date(order.created_at).toLocaleDateString("en-IN")}
           </p>
           <p>{statusCopy.detail}</p>
+          <dl className="order-status-summary">
+            <div>
+              <dt>Order status</dt>
+              <dd>{getOrderStatusLabel(order.status)}</dd>
+            </div>
+            <div>
+              <dt>Payment status</dt>
+              <dd>{getPaymentStatusLabel(order.payment_status)}</dd>
+            </div>
+          </dl>
+          {statusCopy.nextStep ? <p>{statusCopy.nextStep}</p> : null}
         </header>
 
         <div className="checkout-card">
@@ -227,6 +229,15 @@ export default async function CustomerOrderConfirmationPage({
               </p>
             </div>
           </section>
+
+          <OrderPaymentPanel
+            initialAmountDue={initialPayable}
+            orderId={order.id}
+            orderReference={order.order_reference}
+            orderStatus={order.status}
+            paymentRejectionReason={order.payment_rejection_reason}
+            paymentStatus={order.payment_status}
+          />
 
           <section className="order-detail-section">
             <h2>Pickup address</h2>

@@ -4,6 +4,13 @@ import { redirect } from "next/navigation";
 
 import { SignOutButton } from "@/components/auth/SignOutButton";
 import { CustomerProfileAndAddresses } from "@/components/account/CustomerProfileAndAddresses";
+import {
+  getCustomerPaymentRejectionReason,
+  getCustomerOrderStatus,
+  getOrderStatusLabel,
+  getPaymentStatusLabel,
+  type PaymentStatus,
+} from "@/lib/customer-order-status";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -37,6 +44,9 @@ type AccountOrder = {
   rush_fee_amount: number;
   estimated_work_amount: number | null;
   final_payable_amount: number | null;
+  payment_status: PaymentStatus;
+  payment_rejection_reason: string | null;
+  design_executive_name: string | null;
   pickup_address_line1_snapshot: string | null;
   pickup_landmark_snapshot: string | null;
   pickup_locality_snapshot: string | null;
@@ -54,33 +64,6 @@ function formatMoney(amount: number) {
 
 function formatCategory(category: string) {
   return `${category.slice(0, 1).toUpperCase()}${category.slice(1)}`;
-}
-
-function getOrderStatusCopy(status: string) {
-  if (status === "confirmed") {
-    return {
-      label: "Booking confirmed",
-      detail:
-        "Your visit is confirmed. We will share the next operational update when available.",
-    };
-  }
-  if (status === "cancelled") {
-    return {
-      label: "Booking cancelled",
-      detail: "This booking is no longer active.",
-    };
-  }
-  if (status === "draft") {
-    return {
-      label: "Booking draft",
-      detail: "This booking has not been confirmed yet.",
-    };
-  }
-  return {
-    label: "Booking created",
-    detail:
-      "We received your booking. Review the saved details below while we prepare the next step.",
-  };
 }
 
 export default async function AccountPage({
@@ -110,6 +93,9 @@ export default async function AccountPage({
         rush_fee_amount,
         estimated_work_amount,
         final_payable_amount,
+        payment_status,
+        payment_rejection_reason,
+        design_executive_name,
         pickup_address_line1_snapshot,
         pickup_landmark_snapshot,
         pickup_locality_snapshot,
@@ -163,9 +149,16 @@ export default async function AccountPage({
             ) : orders?.length ? (
               <div className="account-orders">
                 {(orders as AccountOrder[]).map((order) => {
-                  const status = getOrderStatusCopy(order.status);
+                  const status = getCustomerOrderStatus({
+                    orderStatus: order.status,
+                    paymentStatus: order.payment_status,
+                    designExecutiveName: order.design_executive_name,
+                  });
                   const initialAmountDue =
                     order.booking_fee_amount + order.rush_fee_amount;
+                  const rejectionReason = getCustomerPaymentRejectionReason(
+                    order.payment_rejection_reason
+                  );
                   const pickupAddress = [
                     order.pickup_address_line1_snapshot,
                     order.pickup_locality_snapshot,
@@ -199,6 +192,21 @@ export default async function AccountPage({
                       <section className="account-order-section">
                         <h3>{status.label}</h3>
                         <p>{status.detail}</p>
+                        <p>
+                          <strong>Order status:</strong>{" "}
+                          {getOrderStatusLabel(order.status)}
+                        </p>
+                        <p>
+                          <strong>Payment status:</strong>{" "}
+                          {getPaymentStatusLabel(order.payment_status)}
+                        </p>
+                        {status.nextStep ? <p>{status.nextStep}</p> : null}
+                        {order.payment_status === "rejected" &&
+                        rejectionReason ? (
+                          <p>
+                            <strong>Reason:</strong> {rejectionReason}
+                          </p>
+                        ) : null}
                       </section>
 
                       <section className="account-order-section">

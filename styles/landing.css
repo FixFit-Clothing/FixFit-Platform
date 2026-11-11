@@ -483,6 +483,96 @@
   font-size: 16px;
 }
 
+.order-status-summary {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 20px;
+  margin: 14px 0 0;
+}
+
+.order-status-summary div {
+  display: flex;
+  gap: 6px;
+  align-items: baseline;
+}
+
+.order-status-summary dt {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.order-status-summary dd {
+  margin: 0;
+  color: var(--charcoal);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.order-payment-panel {
+  display: grid;
+  gap: 14px;
+  margin-top: 24px;
+  padding: 24px;
+  background: var(--cream);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.order-payment-panel h2,
+.order-payment-panel p {
+  margin: 0;
+}
+
+.order-payment-panel > p:not(.section-eyebrow) {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.payment-qr {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  margin: 4px 0 0;
+  padding: 16px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.payment-qr img {
+  display: block;
+  width: min(100%, 320px);
+  height: auto;
+  aspect-ratio: 1;
+  object-fit: contain;
+}
+
+.payment-qr figcaption,
+.payment-submission-form small,
+.payment-refresh-note {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.payment-rejection-reason {
+  padding: 12px;
+  color: #991b1b !important;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+}
+
+.payment-submission-form {
+  margin-top: 0;
+}
+
+.payment-submission-form .auth-error {
+  margin: 0;
+}
+
 .account-history ul {
   padding-left: 18px;
 }
