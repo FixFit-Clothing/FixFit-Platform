@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { type FormEvent, useEffect, useState } from "react";
+import { type FormEvent, useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import {
@@ -9,7 +9,7 @@ import {
   type CustomerAddress,
   type CustomerProfile,
 } from "@/lib/customer";
-import { saveBookingDraft, type BookingDraft } from "@/lib/booking-draft";
+import { type BookingDraft } from "@/lib/booking-draft";
 
 type AddressForm = {
   addressLine1: string;
@@ -57,7 +57,10 @@ async function getJson<T>(url: string, options?: RequestInit) {
 
 type CheckoutCustomerDetailsProps = {
   draft: BookingDraft;
-  onDraftUpdated: (draft: BookingDraft) => void;
+  onDraftUpdated: (
+    draft: BookingDraft,
+    options?: { invalidatePendingSubmission?: boolean }
+  ) => boolean;
 };
 
 export function CheckoutCustomerDetails({
@@ -75,7 +78,7 @@ export function CheckoutCustomerDetails({
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function loadCustomerData() {
+  const loadCustomerData = useCallback(async () => {
     const [profileResponse, addressesResponse] = await Promise.all([
       getJson<{ profile: CustomerProfile }>("/api/customer/profile"),
       getJson<{ addresses: CustomerAddress[] }>("/api/customer/addresses"),
@@ -85,10 +88,16 @@ export function CheckoutCustomerDetails({
     const defaultAddress = addressesResponse.addresses.find(
       (address) => address.isDefault
     );
-    setSelectedAddressId(
-      defaultAddress?.id ?? addressesResponse.addresses[0]?.id ?? null
+    const draftAddress = addressesResponse.addresses.find(
+      (address) => address.id === draft.addressId
     );
-  }
+    setSelectedAddressId(
+      draftAddress?.id ??
+        defaultAddress?.id ??
+        addressesResponse.addresses[0]?.id ??
+        null
+    );
+  }, [draft.addressId]);
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
@@ -98,7 +107,7 @@ export function CheckoutCustomerDetails({
     }, 0);
 
     return () => window.clearTimeout(timeout);
-  }, []);
+  }, [loadCustomerData]);
 
   function beginEdit(address?: CustomerAddress) {
     setEditingAddressId(address?.id ?? null);
@@ -107,6 +116,8 @@ export function CheckoutCustomerDetails({
 
   async function saveAddress(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const editingSelectedAddress =
+      editingAddressId !== null && editingAddressId === selectedAddressId;
     setIsSaving(true);
     setError(null);
 
@@ -132,6 +143,22 @@ export function CheckoutCustomerDetails({
       });
       setSelectedAddressId(response.address.id);
       beginEdit();
+      if (editingSelectedAddress) {
+        const updatedDraft: BookingDraft = {
+          ...draft,
+          addressId: response.address.id,
+          address: formatCustomerAddress(response.address),
+          landmark: response.address.landmark ?? "",
+        };
+        if (
+          !onDraftUpdated(updatedDraft, { invalidatePendingSubmission: true })
+        ) {
+          setError(
+            "Your address was saved, but we could not update this booking draft. Reload the page before submitting."
+          );
+          return;
+        }
+      }
       toast.success(editingAddressId ? "Address updated." : "Address saved.");
     } catch (saveError) {
       setError(
@@ -152,16 +179,16 @@ export function CheckoutCustomerDetails({
 
     const updatedDraft = {
       ...draft,
+      addressId: selected.id,
       address: formatCustomerAddress(selected),
       landmark: selected.landmark ?? "",
     };
-    const saved = saveBookingDraft(updatedDraft);
-    if (!saved.ok) {
-      setError(saved.error);
+    if (!onDraftUpdated(updatedDraft)) {
+      setError(
+        "We could not update this booking draft on this device. Please try again."
+      );
       return;
     }
-
-    onDraftUpdated(updatedDraft);
     toast.success("Saved address applied to this booking draft.");
   }
 
@@ -336,7 +363,7 @@ export function CheckoutCustomerDetails({
 
       <p className="checkout-phone-gate">
         {profile?.phone
-          ? "Your phone number is saved. Booking creation will be available in a later sprint."
+          ? "Your phone number is saved. You can create a booking after choosing a saved pickup address."
           : "A saved phone number is required before booking can continue."}
       </p>
     </section>

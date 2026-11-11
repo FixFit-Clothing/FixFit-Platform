@@ -28,6 +28,25 @@ export type BookingDraftCartItem = {
   photo: { previewUrl: string };
 };
 
+export type BookingOrderIssue = {
+  issueId: string;
+  optionIds: string[];
+};
+
+export type BookingOrderItem = {
+  garmentTypeId: string;
+  serviceTierCode: ServiceTier;
+  rush: boolean;
+  issues: BookingOrderIssue[];
+};
+
+export type BookingOrderSubmission = {
+  idempotencyKey: string;
+  addressId: string;
+  paymentMethod: "upi";
+  items: BookingOrderItem[];
+};
+
 export type BookingDraft = {
   version: typeof BOOKING_DRAFT_VERSION;
   createdAt: number;
@@ -37,6 +56,10 @@ export type BookingDraft = {
   address: string;
   landmark: string;
   paymentMethod: "UPI" | "Card";
+  // The customer-owned address selected during checkout, if one has been applied.
+  addressId?: string;
+  // Persisted before a submission attempt so retries use an identical request.
+  orderSubmission?: BookingOrderSubmission;
   // Display-only browser estimate. The trusted booking workflow must recalculate it.
   estimate: EstimateSummary;
 };
@@ -50,6 +73,10 @@ type BookingDraftInput = Omit<
   "version" | "createdAt" | "updatedAt" | "expiresAt" | "estimate"
 > & {
   estimate?: EstimateSummary;
+};
+
+type SaveBookingDraftOptions = {
+  replacePendingSubmission?: boolean;
 };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -72,6 +99,15 @@ function isFiniteNumber(value: unknown) {
 
 function isNonEmptyString(value: unknown) {
   return typeof value === "string" && value.trim().length > 0;
+}
+
+function isUuid(value: unknown) {
+  return (
+    typeof value === "string" &&
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+      value
+    )
+  );
 }
 
 function isEstimateSummary(value: unknown): value is EstimateSummary {
@@ -112,6 +148,34 @@ function isDraftCartItem(value: unknown): value is BookingDraftCartItem {
   );
 }
 
+function isOrderSubmission(value: unknown): value is BookingOrderSubmission {
+  if (!isRecord(value)) return false;
+
+  return (
+    isUuid(value.idempotencyKey) &&
+    isUuid(value.addressId) &&
+    value.paymentMethod === "upi" &&
+    Array.isArray(value.items) &&
+    value.items.length > 0 &&
+    value.items.every(
+      (item) =>
+        isRecord(item) &&
+        isUuid(item.garmentTypeId) &&
+        isTier(item.serviceTierCode) &&
+        typeof item.rush === "boolean" &&
+        Array.isArray(item.issues) &&
+        item.issues.length > 0 &&
+        item.issues.every(
+          (issue) =>
+            isRecord(issue) &&
+            isUuid(issue.issueId) &&
+            Array.isArray(issue.optionIds) &&
+            issue.optionIds.every(isUuid)
+        )
+    )
+  );
+}
+
 function isBookingDraft(value: unknown): value is BookingDraft {
   if (!isRecord(value)) return false;
 
@@ -126,6 +190,9 @@ function isBookingDraft(value: unknown): value is BookingDraft {
     typeof value.address === "string" &&
     typeof value.landmark === "string" &&
     (value.paymentMethod === "UPI" || value.paymentMethod === "Card") &&
+    (value.addressId === undefined || isUuid(value.addressId)) &&
+    (value.orderSubmission === undefined ||
+      isOrderSubmission(value.orderSubmission)) &&
     isEstimateSummary(value.estimate)
   );
 }
@@ -143,7 +210,10 @@ export function createBookingDraft(input: BookingDraftInput): BookingDraft {
   };
 }
 
-export function saveBookingDraft(draft: BookingDraft) {
+export function saveBookingDraft(
+  draft: BookingDraft,
+  options: SaveBookingDraftOptions = {}
+) {
   if (typeof window === "undefined") {
     return {
       ok: false,
@@ -152,6 +222,23 @@ export function saveBookingDraft(draft: BookingDraft) {
   }
 
   try {
+    const stored = window.localStorage.getItem(BOOKING_DRAFT_STORAGE_KEY);
+    if (stored) {
+      const existing: unknown = JSON.parse(stored);
+      if (
+        isBookingDraft(existing) &&
+        existing.orderSubmission &&
+        !options.replacePendingSubmission &&
+        JSON.stringify(existing.orderSubmission) !==
+          JSON.stringify(draft.orderSubmission)
+      ) {
+        return {
+          ok: false,
+          error:
+            "A booking submission is still pending. Return to checkout to retry it or explicitly abandon it before changing this draft.",
+        } as const;
+      }
+    }
     window.localStorage.setItem(
       BOOKING_DRAFT_STORAGE_KEY,
       JSON.stringify(draft)
@@ -175,7 +262,12 @@ export function loadBookingDraft(): BookingDraftLoadResult {
 
     const parsed: unknown = JSON.parse(stored);
     if (!isBookingDraft(parsed)) return { status: "invalid" };
-    if (parsed.expiresAt <= Date.now()) return { status: "expired" };
+    // A submitted request may have reached the server even when the browser
+    // never received its response. Keep its exact idempotency key and payload
+    // available for a safe retry after the ordinary cart-draft window closes.
+    if (parsed.expiresAt <= Date.now() && !parsed.orderSubmission) {
+      return { status: "expired" };
+    }
 
     return { status: "ready", draft: parsed };
   } catch {

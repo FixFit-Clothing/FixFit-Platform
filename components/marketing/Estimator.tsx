@@ -82,7 +82,7 @@ export function Estimator({
   const [query, setQuery] = useState("");
   const [address, setAddress] = useState("");
   const [landmark, setLandmark] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState<"UPI" | "Card">("UPI");
+  const paymentMethod = "UPI";
   const [error, setError] = useState("");
   const [coverageMessage, setCoverageMessage] = useState("");
   const [isContinuing, setIsContinuing] = useState(false);
@@ -102,7 +102,6 @@ export function Estimator({
         setCart(result.draft.cart);
         setAddress(result.draft.address);
         setLandmark(result.draft.landmark);
-        setPaymentMethod(result.draft.paymentMethod);
         setStep(3);
         setDraftMessage("Your saved booking draft has been restored.");
       } else if (result.status === "expired") {
@@ -696,12 +695,12 @@ export function Estimator({
                 </p>
               )}
               <p className="total">
-                <span>Pay now via {paymentMethod}</span>
+                <span>Initial amount due after booking is created</span>
                 <strong>₹{estimate.payNow}</strong>
               </p>
               <small>
                 Exact pricing is confirmed after in-person garment assessment.
-                The booking fee covers the whole visit.
+                Payment is handled after your booking is created.
               </small>
             </div>
             <label className="estimator-field">
@@ -721,18 +720,8 @@ export function Estimator({
               />
             </label>
             <fieldset className="estimator-payment">
-              <legend>Paying now</legend>
-              {(["UPI", "Card"] as const).map((item) => (
-                <label key={item}>
-                  <input
-                    checked={paymentMethod === item}
-                    name="payment"
-                    onChange={() => setPaymentMethod(item)}
-                    type="radio"
-                  />
-                  {item}
-                </label>
-              ))}
+              <legend>Payment method after booking</legend>
+              <p>UPI</p>
             </fieldset>
             {error && (
               <p className="estimator-error" role="alert">
