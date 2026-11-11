@@ -13,12 +13,22 @@ type AddressForm = {
   isDefault: boolean;
 };
 
+type ProfileForm = {
+  fullName: string;
+  phone: string;
+};
+
 const emptyAddress: AddressForm = {
   addressLine1: "",
   landmark: "",
   locality: "HSR Layout",
   city: "Bengaluru",
   isDefault: false,
+};
+
+const emptyProfile: ProfileForm = {
+  fullName: "",
+  phone: "",
 };
 
 function toAddressForm(address: CustomerAddress): AddressForm {
@@ -56,8 +66,11 @@ export function CustomerProfileAndAddresses() {
   const [isSavingProfile, setIsSavingProfile] = useState(false);
   const [isSavingAddress, setIsSavingAddress] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isEditingProfile, setIsEditingProfile] = useState(false);
+  const [profileForm, setProfileForm] = useState<ProfileForm>(emptyProfile);
   const [editingAddressId, setEditingAddressId] = useState<string | null>(null);
   const [addressForm, setAddressForm] = useState<AddressForm>(emptyAddress);
+  const [isAddressFormOpen, setIsAddressFormOpen] = useState(false);
 
   async function loadCustomerData() {
     const [profileResponse, addressesResponse] = await Promise.all([
@@ -92,12 +105,17 @@ export function CustomerProfileAndAddresses() {
         {
           method: "PUT",
           body: JSON.stringify({
-            fullName: profile.fullName ?? "",
-            phone: profile.phone,
+            fullName: profileForm.fullName,
+            phone: profileForm.phone,
           }),
         }
       );
       setProfile(response.profile);
+      setProfileForm({
+        fullName: response.profile.fullName ?? "",
+        phone: response.profile.phone ?? "",
+      });
+      setIsEditingProfile(false);
       toast.success("Profile saved.");
     } catch (saveError) {
       setError(
@@ -110,9 +128,34 @@ export function CustomerProfileAndAddresses() {
     }
   }
 
+  function beginProfileEdit() {
+    if (!profile) return;
+
+    setProfileForm({
+      fullName: profile.fullName ?? "",
+      phone: profile.phone ?? "",
+    });
+    setIsEditingProfile(true);
+    setIsAddressFormOpen(false);
+    setEditingAddressId(null);
+  }
+
+  function cancelProfileEdit() {
+    setProfileForm(emptyProfile);
+    setIsEditingProfile(false);
+  }
+
   function beginAddressEdit(address?: CustomerAddress) {
     setEditingAddressId(address?.id ?? null);
     setAddressForm(address ? toAddressForm(address) : emptyAddress);
+    setIsAddressFormOpen(true);
+    setIsEditingProfile(false);
+  }
+
+  function cancelAddressEdit() {
+    setEditingAddressId(null);
+    setAddressForm(emptyAddress);
+    setIsAddressFormOpen(false);
   }
 
   async function saveAddress(event: FormEvent<HTMLFormElement>) {
@@ -141,7 +184,7 @@ export function CustomerProfileAndAddresses() {
           (left, right) => Number(right.isDefault) - Number(left.isDefault)
         );
       });
-      beginAddressEdit();
+      cancelAddressEdit();
       toast.success(editingAddressId ? "Address updated." : "Address saved.");
     } catch (saveError) {
       setError(
@@ -164,7 +207,7 @@ export function CustomerProfileAndAddresses() {
       setAddresses((current) =>
         current.filter((address) => address.id !== addressId)
       );
-      if (editingAddressId === addressId) beginAddressEdit();
+      if (editingAddressId === addressId) cancelAddressEdit();
       toast.success("Address deleted.");
     } catch (deleteError) {
       setError(
@@ -202,56 +245,96 @@ export function CustomerProfileAndAddresses() {
         className="account-section"
         aria-labelledby="profile-details-title"
       >
-        <div>
-          <h2 id="profile-details-title">Profile details</h2>
-          <p>Keep your contact information ready for your booking.</p>
+        <div className="account-section-heading">
+          <div>
+            <h2 id="profile-details-title">Profile details</h2>
+            <p>Keep your contact information ready for your booking.</p>
+          </div>
+          {!isEditingProfile ? (
+            <button
+              className="auth-text-button"
+              onClick={beginProfileEdit}
+              type="button"
+            >
+              Edit profile
+            </button>
+          ) : null}
         </div>
-        <form className="auth-form" onSubmit={saveProfile} noValidate>
-          <label htmlFor="profile-name">Full name</label>
-          <input
-            id="profile-name"
-            value={profile.fullName ?? ""}
-            onChange={(event) =>
-              setProfile((current) =>
-                current ? { ...current, fullName: event.target.value } : current
-              )
-            }
-            disabled={isSavingProfile}
-            required
-          />
-          <label htmlFor="profile-email">Email address</label>
-          <input
-            id="profile-email"
-            value={profile.email}
-            readOnly
-            aria-readonly="true"
-          />
-          <label htmlFor="profile-phone">Phone number</label>
-          <input
-            id="profile-phone"
-            inputMode="tel"
-            autoComplete="tel"
-            placeholder="Required before booking"
-            value={profile.phone ?? ""}
-            onChange={(event) =>
-              setProfile((current) =>
-                current ? { ...current, phone: event.target.value } : current
-              )
-            }
-            disabled={isSavingProfile}
-          />
-          <small className="account-helper">
-            Your phone number is not verified in this step, but it will be
-            required before booking.
-          </small>
-          <button
-            className="btn-primary auth-submit"
-            disabled={isSavingProfile}
-            type="submit"
-          >
-            {isSavingProfile ? "Saving profile…" : "Save profile"}
-          </button>
-        </form>
+        {isEditingProfile ? (
+          <form className="auth-form" onSubmit={saveProfile} noValidate>
+            <label htmlFor="profile-name">Full name</label>
+            <input
+              id="profile-name"
+              value={profileForm.fullName}
+              onChange={(event) =>
+                setProfileForm((current) => ({
+                  ...current,
+                  fullName: event.target.value,
+                }))
+              }
+              disabled={isSavingProfile}
+              required
+            />
+            <label htmlFor="profile-email">Email address</label>
+            <input
+              id="profile-email"
+              value={profile.email}
+              readOnly
+              aria-readonly="true"
+            />
+            <label htmlFor="profile-phone">Phone number</label>
+            <input
+              id="profile-phone"
+              inputMode="tel"
+              autoComplete="tel"
+              placeholder="Required before booking"
+              value={profileForm.phone}
+              onChange={(event) =>
+                setProfileForm((current) => ({
+                  ...current,
+                  phone: event.target.value,
+                }))
+              }
+              disabled={isSavingProfile}
+            />
+            <small className="account-helper">
+              Your phone number is not verified in this step, but it will be
+              required before booking.
+            </small>
+            <div className="account-form-actions">
+              <button
+                className="btn-primary auth-submit"
+                disabled={isSavingProfile}
+                type="submit"
+              >
+                {isSavingProfile ? "Saving profile…" : "Save profile"}
+              </button>
+              <button
+                className="auth-text-button"
+                disabled={isSavingProfile}
+                onClick={cancelProfileEdit}
+                type="button"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        ) : (
+          <dl className="account-summary">
+            <div>
+              <dt>Full name</dt>
+              <dd>{profile.fullName ?? "Not added"}</dd>
+            </div>
+            <div>
+              <dt>Email address</dt>
+              <dd>{profile.email}</dd>
+            </div>
+            <div>
+              <dt>Phone number</dt>
+              <dd>{profile.phone ?? "Add a phone number before booking."}</dd>
+            </div>
+          </dl>
+        )}
       </section>
 
       <section
@@ -309,89 +392,101 @@ export function CustomerProfileAndAddresses() {
           <p className="account-empty">No saved addresses yet.</p>
         )}
 
-        <form
-          className="auth-form account-address-form"
-          onSubmit={saveAddress}
-          noValidate
-        >
-          <h3>{editingAddressId ? "Edit address" : "Add an address"}</h3>
-          <label htmlFor="address-line1">Address line</label>
-          <input
-            id="address-line1"
-            value={addressForm.addressLine1}
-            onChange={(event) =>
-              setAddressForm((current) => ({
-                ...current,
-                addressLine1: event.target.value,
-              }))
-            }
-            disabled={isSavingAddress}
-            required
-          />
-          <label htmlFor="address-landmark">Landmark (optional)</label>
-          <input
-            id="address-landmark"
-            value={addressForm.landmark}
-            onChange={(event) =>
-              setAddressForm((current) => ({
-                ...current,
-                landmark: event.target.value,
-              }))
-            }
-            disabled={isSavingAddress}
-          />
-          <label htmlFor="address-locality">Locality</label>
-          <input
-            id="address-locality"
-            value={addressForm.locality}
-            onChange={(event) =>
-              setAddressForm((current) => ({
-                ...current,
-                locality: event.target.value,
-              }))
-            }
-            disabled={isSavingAddress}
-            required
-          />
-          <label htmlFor="address-city">City</label>
-          <input
-            id="address-city"
-            value={addressForm.city}
-            onChange={(event) =>
-              setAddressForm((current) => ({
-                ...current,
-                city: event.target.value,
-              }))
-            }
-            disabled={isSavingAddress}
-            required
-          />
-          <label className="account-checkbox">
+        {isAddressFormOpen ? (
+          <form
+            className="auth-form account-address-form"
+            onSubmit={saveAddress}
+            noValidate
+          >
+            <h3>{editingAddressId ? "Edit address" : "Add an address"}</h3>
+            <label htmlFor="address-line1">Address line</label>
             <input
-              checked={addressForm.isDefault}
+              id="address-line1"
+              value={addressForm.addressLine1}
               onChange={(event) =>
                 setAddressForm((current) => ({
                   ...current,
-                  isDefault: event.target.checked,
+                  addressLine1: event.target.value,
                 }))
               }
               disabled={isSavingAddress}
-              type="checkbox"
+              required
             />
-            Set as default pickup address
-          </label>
-          <button
-            className="btn-primary auth-submit"
-            disabled={isSavingAddress}
-            type="submit"
-          >
-            {isSavingAddress
-              ? "Saving address…"
-              : editingAddressId
-                ? "Save address"
-                : "Add address"}
-          </button>
-        </form>
+            <label htmlFor="address-landmark">Landmark (optional)</label>
+            <input
+              id="address-landmark"
+              value={addressForm.landmark}
+              onChange={(event) =>
+                setAddressForm((current) => ({
+                  ...current,
+                  landmark: event.target.value,
+                }))
+              }
+              disabled={isSavingAddress}
+            />
+            <label htmlFor="address-locality">Locality</label>
+            <input
+              id="address-locality"
+              value={addressForm.locality}
+              onChange={(event) =>
+                setAddressForm((current) => ({
+                  ...current,
+                  locality: event.target.value,
+                }))
+              }
+              disabled={isSavingAddress}
+              required
+            />
+            <label htmlFor="address-city">City</label>
+            <input
+              id="address-city"
+              value={addressForm.city}
+              onChange={(event) =>
+                setAddressForm((current) => ({
+                  ...current,
+                  city: event.target.value,
+                }))
+              }
+              disabled={isSavingAddress}
+              required
+            />
+            <label className="account-checkbox">
+              <input
+                checked={addressForm.isDefault}
+                onChange={(event) =>
+                  setAddressForm((current) => ({
+                    ...current,
+                    isDefault: event.target.checked,
+                  }))
+                }
+                disabled={isSavingAddress}
+                type="checkbox"
+              />
+              Set as default pickup address
+            </label>
+            <div className="account-form-actions">
+              <button
+                className="btn-primary auth-submit"
+                disabled={isSavingAddress}
+                type="submit"
+              >
+                {isSavingAddress
+                  ? "Saving address…"
+                  : editingAddressId
+                    ? "Save address"
+                    : "Add address"}
+              </button>
+              <button
+                className="auth-text-button"
+                disabled={isSavingAddress}
+                onClick={cancelAddressEdit}
+                type="button"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        ) : null}
       </section>
     </div>
   );

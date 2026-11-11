@@ -342,6 +342,147 @@
   font-size: 13px;
 }
 
+.account-summary,
+.account-order-pricing {
+  display: grid;
+  gap: 8px;
+}
+
+.account-summary {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.account-summary div,
+.account-order {
+  padding: 14px;
+  background: var(--cream);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+}
+
+.account-summary dt,
+.account-order-reference {
+  margin: 0;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.account-summary dd {
+  margin: 5px 0 0;
+  color: var(--charcoal);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.account-form-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.account-form-actions .auth-submit {
+  width: auto;
+  margin-top: 0;
+}
+
+.account-orders {
+  display: grid;
+  gap: 16px;
+}
+
+.account-order {
+  display: grid;
+  gap: 16px;
+  background: var(--white);
+}
+
+.account-order-header {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.account-order-header > div > p:not(.account-order-reference),
+.account-order-section > p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.account-order-section {
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.account-order-section h3 {
+  margin: 0;
+  color: var(--charcoal);
+  font-size: 14px;
+}
+
+.account-order-items,
+.account-order-items ul {
+  display: grid;
+  gap: 6px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.account-order-items > li {
+  display: grid;
+  gap: 4px;
+}
+
+.account-order-items strong {
+  color: var(--charcoal);
+  font-size: 13px;
+}
+
+.account-order-items > li > span,
+.account-order-items ul {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.account-order-pricing p {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.account-order-pricing strong {
+  color: var(--charcoal);
+}
+
+.account-order-pricing .total {
+  padding-top: 8px;
+  color: var(--charcoal);
+  border-top: 1px solid var(--line);
+  font-weight: 700;
+}
+
+.order-detail-section + .order-detail-section {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}
+
+.order-detail-section > h2 {
+  margin: 0 0 14px;
+  color: var(--charcoal);
+  font-size: 16px;
+}
+
 .account-history ul {
   padding-left: 18px;
 }
@@ -361,6 +502,14 @@
 
   .account-section-heading,
   .saved-address {
+    flex-direction: column;
+  }
+
+  .account-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .account-order-header {
     flex-direction: column;
   }
 

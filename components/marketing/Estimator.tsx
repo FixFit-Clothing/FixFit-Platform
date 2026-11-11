@@ -24,6 +24,7 @@ import {
 import { calculateEstimate } from "@/lib/estimator-pricing";
 import { processGarmentPhoto, type GarmentPhoto } from "@/lib/estimator-photo";
 import { createClient } from "@/lib/supabase/client";
+import { formatCustomerAddress, type CustomerAddress } from "@/lib/customer";
 
 type SelectedIssue = BookingDraftIssue;
 type EstimatorCartItem = BookingDraftCartItem;
@@ -82,11 +83,13 @@ export function Estimator({
   const [query, setQuery] = useState("");
   const [address, setAddress] = useState("");
   const [landmark, setLandmark] = useState("");
+  const [addressId, setAddressId] = useState<string | undefined>();
   const paymentMethod = "UPI";
   const [error, setError] = useState("");
   const [coverageMessage, setCoverageMessage] = useState("");
   const [isContinuing, setIsContinuing] = useState(false);
   const [draftMessage, setDraftMessage] = useState("");
+  const [hasRestoredDraft, setHasRestoredDraft] = useState(false);
 
   useEffect(() => {
     loadGuides()
@@ -102,6 +105,7 @@ export function Estimator({
         setCart(result.draft.cart);
         setAddress(result.draft.address);
         setLandmark(result.draft.landmark);
+        setAddressId(result.draft.addressId);
         setStep(3);
         setDraftMessage("Your saved booking draft has been restored.");
       } else if (result.status === "expired") {
@@ -113,10 +117,57 @@ export function Estimator({
           "We could not restore the saved booking draft. You can discard it and start a new one."
         );
       }
+      setHasRestoredDraft(true);
     }, 0);
 
     return () => window.clearTimeout(timeout);
   }, []);
+
+  useEffect(() => {
+    if (!hasRestoredDraft || addressId || address.trim()) return;
+
+    let isCurrent = true;
+
+    async function applyDefaultAddress() {
+      try {
+        const supabase = createClient();
+        const { data, error: claimsError } = await supabase.auth.getClaims();
+        if (claimsError || !data?.claims?.sub) return;
+
+        const response = await fetch("/api/customer/addresses");
+        if (!response.ok) return;
+
+        const body: unknown = await response.json().catch(() => null);
+        if (
+          !isCurrent ||
+          typeof body !== "object" ||
+          body === null ||
+          !("addresses" in body) ||
+          !Array.isArray(body.addresses)
+        ) {
+          return;
+        }
+
+        const defaultAddress = (body.addresses as CustomerAddress[]).find(
+          (savedAddress) => savedAddress.isDefault
+        );
+        if (!defaultAddress) return;
+
+        setAddressId(defaultAddress.id);
+        setAddress(formatCustomerAddress(defaultAddress));
+        setLandmark(defaultAddress.landmark ?? "");
+      } catch {
+        // Checkout continues to offer saved-address selection if this optional
+        // convenience lookup is unavailable.
+      }
+    }
+
+    void applyDefaultAddress();
+
+    return () => {
+      isCurrent = false;
+    };
+  }, [address, addressId, hasRestoredDraft]);
 
   const guideRows = useMemo(() => {
     const rows = guides[garment] ?? [];
@@ -241,6 +292,7 @@ export function Estimator({
       cart,
       address: address.trim(),
       landmark: landmark.trim(),
+      addressId,
       paymentMethod,
       estimate,
     });
@@ -280,6 +332,7 @@ export function Estimator({
     setPhoto(null);
     setAddress("");
     setLandmark("");
+    setAddressId(undefined);
     setDraftMessage("");
     setStep(1);
   }
@@ -700,13 +753,17 @@ export function Estimator({
               </p>
               <small>
                 Exact pricing is confirmed after in-person garment assessment.
-                Payment is handled after your booking is created.
+                We&apos;ll share the next booking step after your order is
+                created.
               </small>
             </div>
             <label className="estimator-field">
               Pickup address
               <input
-                onChange={(event) => setAddress(event.target.value)}
+                onChange={(event) => {
+                  setAddress(event.target.value);
+                  setAddressId(undefined);
+                }}
                 placeholder="Flat / House No., HSR Layout"
                 value={address}
               />
@@ -714,13 +771,16 @@ export function Estimator({
             <label className="estimator-field">
               Landmark (optional)
               <input
-                onChange={(event) => setLandmark(event.target.value)}
+                onChange={(event) => {
+                  setLandmark(event.target.value);
+                  setAddressId(undefined);
+                }}
                 placeholder="Near HSR Club"
                 value={landmark}
               />
             </label>
             <fieldset className="estimator-payment">
-              <legend>Payment method after booking</legend>
+              <legend>Booking method</legend>
               <p>UPI</p>
             </fieldset>
             {error && (

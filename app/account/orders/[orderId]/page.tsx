@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Booking details",
-  description: "Review your FixFit booking and payment-verification status.",
+  description: "Review your FixFit booking details.",
 };
 
 type OrderOption = { id: string; option_name_snapshot: string };
@@ -37,6 +37,10 @@ type CustomerOrder = {
   booking_fee_amount: number;
   rush_fee_amount: number;
   final_payable_amount: number | null;
+  pickup_address_line1_snapshot: string | null;
+  pickup_landmark_snapshot: string | null;
+  pickup_locality_snapshot: string | null;
+  pickup_city_snapshot: string | null;
   order_items: OrderItem[];
 };
 
@@ -74,10 +78,14 @@ function getOrderStatusCopy(status: string) {
 
   return {
     eyebrow: "Booking created",
-    title: "Your booking is awaiting payment verification",
+    title: "Your FixFit booking has been created",
     detail:
-      "Your booking was created, but payment has not been verified. Do not treat this order as paid.",
+      "We received your booking. We’ll share the next step when it is ready.",
   };
+}
+
+function formatCategory(category: string) {
+  return `${category.slice(0, 1).toUpperCase()}${category.slice(1)}`;
 }
 
 export default async function CustomerOrderConfirmationPage({
@@ -107,6 +115,10 @@ export default async function CustomerOrderConfirmationPage({
         booking_fee_amount,
         rush_fee_amount,
         final_payable_amount,
+        pickup_address_line1_snapshot,
+        pickup_landmark_snapshot,
+        pickup_locality_snapshot,
+        pickup_city_snapshot,
         order_items (
           id,
           garment_name_snapshot,
@@ -134,6 +146,13 @@ export default async function CustomerOrderConfirmationPage({
   const order = data as CustomerOrder;
   const initialPayable = order.booking_fee_amount + order.rush_fee_amount;
   const statusCopy = getOrderStatusCopy(order.status);
+  const pickupAddress = [
+    order.pickup_address_line1_snapshot,
+    order.pickup_locality_snapshot,
+    order.pickup_city_snapshot,
+  ]
+    .filter(Boolean)
+    .join(", ");
 
   return (
     <main className="checkout-page">
@@ -147,63 +166,87 @@ export default async function CustomerOrderConfirmationPage({
             {statusCopy.title}
           </h1>
           <p>
-            Reference <strong>{order.order_reference}</strong> · {order.status}
+            Reference <strong>{order.order_reference}</strong> · Created{" "}
+            {new Date(order.created_at).toLocaleDateString("en-IN")}
           </p>
           <p>{statusCopy.detail}</p>
         </header>
 
         <div className="checkout-card">
-          <h2>Selected garments</h2>
-          <div className="estimator-cart">
-            {order.order_items.map((item) => (
-              <div className="estimator-cart-item" key={item.id}>
-                <div>
-                  <strong>{item.garment_name_snapshot}</strong>
-                  <p>
-                    {item.order_item_issues
-                      .map((issue) => {
-                        const options = issue.order_item_options
-                          .map((option) => option.option_name_snapshot)
-                          .join(", ");
-                        return options
-                          ? `${issue.issue_name_snapshot} → ${options}`
-                          : issue.issue_name_snapshot;
-                      })
-                      .join(" · ")}
-                  </p>
-                  <small>
-                    {item.service_tier_name_snapshot} ·{" "}
-                    {item.service_tier_turnaround_snapshot}
-                    {item.is_rush ? " · Rush selected" : ""}
-                  </small>
+          <section className="order-detail-section">
+            <h2>Selected garments</h2>
+            <div className="estimator-cart">
+              {order.order_items.map((item) => (
+                <div className="estimator-cart-item" key={item.id}>
+                  <div>
+                    <strong>{item.garment_name_snapshot}</strong>
+                    <p>
+                      {item.order_item_issues
+                        .map((issue) => {
+                          const options = issue.order_item_options
+                            .map((option) => option.option_name_snapshot)
+                            .join(", ");
+                          const selection = `${formatCategory(
+                            issue.issue_category_snapshot
+                          )}: ${issue.issue_name_snapshot}`;
+                          return options
+                            ? `${selection} → ${options}`
+                            : selection;
+                        })
+                        .join(" · ")}
+                    </p>
+                    <small>
+                      {item.service_tier_name_snapshot} ·{" "}
+                      {item.service_tier_turnaround_snapshot}
+                      {item.is_rush ? " · Rush selected" : ""}
+                    </small>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          </section>
 
-          <div className="estimator-summary">
-            <p>
-              <span>Estimated work amount</span>
-              <strong>{formatMoney(order.estimated_work_amount ?? 0)}</strong>
-            </p>
-            <p>
-              <span>Booking fee</span>
-              <strong>{formatMoney(order.booking_fee_amount)}</strong>
-            </p>
-            <p>
-              <span>Rush fee</span>
-              <strong>{formatMoney(order.rush_fee_amount)}</strong>
-            </p>
-            <p className="total">
-              <span>Initial amount due</span>
-              <strong>{formatMoney(initialPayable)}</strong>
-            </p>
-          </div>
+          <section className="order-detail-section">
+            <h2>Pricing summary</h2>
+            <div className="estimator-summary">
+              <p>
+                <span>Estimated work amount</span>
+                <strong>{formatMoney(order.estimated_work_amount ?? 0)}</strong>
+              </p>
+              <p>
+                <span>Booking fee</span>
+                <strong>{formatMoney(order.booking_fee_amount)}</strong>
+              </p>
+              <p>
+                <span>Rush fee</span>
+                <strong>{formatMoney(order.rush_fee_amount)}</strong>
+              </p>
+              <p className="total">
+                <span>Initial amount due</span>
+                <strong>{formatMoney(initialPayable)}</strong>
+              </p>
+            </div>
+          </section>
+
+          <section className="order-detail-section">
+            <h2>Pickup address</h2>
+            <dl className="checkout-details">
+              <div>
+                <dt>Service address</dt>
+                <dd>{pickupAddress || "Address saved with this order."}</dd>
+              </div>
+              {order.pickup_landmark_snapshot ? (
+                <div>
+                  <dt>Landmark</dt>
+                  <dd>{order.pickup_landmark_snapshot}</dd>
+                </div>
+              ) : null}
+            </dl>
+          </section>
 
           <p className="checkout-phone-gate">
             The final work amount is determined after your garment assessment.
-            The booking fee is credited against that final bill. Payment is not
-            verified until FixFit confirms it.
+            The booking fee is credited against that final bill.
           </p>
 
           <div className="checkout-actions">

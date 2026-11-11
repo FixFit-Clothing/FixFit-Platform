@@ -299,7 +299,7 @@ export function CheckoutConfirmation({
           <p>
             {draft.orderSubmission
               ? "Your booking request is pending confirmation. Retrying uses the same saved request."
-              : "Review your booking details. Payment is not requested until after an order is created."}
+              : "Review your booking details before creating your order."}
           </p>
         </header>
 

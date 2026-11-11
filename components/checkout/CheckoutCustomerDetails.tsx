@@ -91,13 +91,21 @@ export function CheckoutCustomerDetails({
     const draftAddress = addressesResponse.addresses.find(
       (address) => address.id === draft.addressId
     );
-    setSelectedAddressId(
-      draftAddress?.id ??
-        defaultAddress?.id ??
-        addressesResponse.addresses[0]?.id ??
-        null
-    );
-  }, [draft.addressId]);
+    const preferredAddress = draftAddress ?? defaultAddress;
+    setSelectedAddressId(preferredAddress?.id ?? null);
+
+    // A pending submission is an immutable request snapshot. Never replace its
+    // address with the current default if a legacy or incomplete draft lacks an
+    // address ID; the customer can explicitly choose an address instead.
+    if (!draftAddress && defaultAddress && !draft.orderSubmission) {
+      onDraftUpdated({
+        ...draft,
+        addressId: defaultAddress.id,
+        address: formatCustomerAddress(defaultAddress),
+        landmark: defaultAddress.landmark ?? "",
+      });
+    }
+  }, [draft, onDraftUpdated]);
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
