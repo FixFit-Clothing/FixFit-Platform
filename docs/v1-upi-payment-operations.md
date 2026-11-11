@@ -55,10 +55,15 @@ begin
   set
     payment_status = 'verified',
     payment_verified_at = now(),
-    status = 'confirmed'
+    status = 'confirmed',
+    design_executive_name = 'Varshitha',
+    design_executive_assigned_at = now()
   where id = 'REPLACE_WITH_ORDER_UUID'::uuid
     and status = 'pending'
-    and payment_status = 'submitted';
+    and payment_status = 'submitted'
+    and payment_method = 'upi'
+    and design_executive_name is null
+    and design_executive_assigned_at is null;
 
   get diagnostics v_updated_rows = row_count;
   if v_updated_rows <> 1 then
@@ -74,7 +79,9 @@ select
   order_reference,
   status,
   payment_status,
-  payment_verified_at
+  payment_verified_at,
+  design_executive_name,
+  design_executive_assigned_at
 from public.orders
 where id = 'REPLACE_WITH_ORDER_UUID'::uuid;
 
@@ -129,35 +136,33 @@ where id = 'REPLACE_WITH_ORDER_UUID'::uuid;
 commit;
 ```
 
-## Assign a design executive
+## Assign Varshitha to an already confirmed booking
 
-Only assign an executive when the booking is confirmed and the name is
-confirmed. The database constraint requires the name and assignment timestamp
-to be set together.
+Use this only for an order that was already verified and confirmed before the
+automatic assignment above was introduced. It does not modify payment fields
+or re-verify the payment, and it refuses to overwrite an existing assignment.
 
 ```sql
 begin;
 
 do $$
 declare
-  v_executive_name text := trim('REPLACE_WITH_EXECUTIVE_NAME');
   v_updated_rows bigint;
 begin
-  if length(v_executive_name) = 0 then
-    raise exception 'An executive name is required.';
-  end if;
-
   update public.orders
   set
-    design_executive_name = v_executive_name,
+    design_executive_name = 'Varshitha',
     design_executive_assigned_at = now()
   where id = 'REPLACE_WITH_ORDER_UUID'::uuid
-    and status = 'confirmed';
+    and status = 'confirmed'
+    and payment_status = 'verified'
+    and design_executive_name is null
+    and design_executive_assigned_at is null;
 
   get diagnostics v_updated_rows = row_count;
   if v_updated_rows <> 1 then
     raise exception
-      'Executive assignment requires exactly one confirmed order; updated % rows.',
+      'Executive assignment requires exactly one unassigned verified confirmed order; updated % rows.',
       v_updated_rows;
   end if;
 end;
@@ -176,6 +181,5 @@ commit;
 ```
 
 If any block raises an exception, the transaction is aborted. Run `rollback;`,
-inspect the order again, and do not force an update. To correct an assignment,
-run the assignment operation with the corrected name; do not clear only one
-assignment field.
+inspect the order again, and do not force an update. Do not overwrite an
+existing assignment or clear only one assignment field.

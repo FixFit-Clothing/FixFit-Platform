@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
+import { AssignedDesignExecutive } from "@/components/orders/AssignedDesignExecutive";
 import { OrderPaymentPanel } from "@/components/orders/OrderPaymentPanel";
 import {
   getCustomerOrderStatus,
@@ -9,6 +10,7 @@ import {
   getPaymentStatusLabel,
   type PaymentStatus,
 } from "@/lib/customer-order-status";
+import { getDesignExecutiveByAssignedName } from "@/lib/design-executives";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -132,10 +134,18 @@ export default async function CustomerOrderConfirmationPage({
   if (error || !data) notFound();
   const order = data as CustomerOrder;
   const initialPayable = order.booking_fee_amount + order.rush_fee_amount;
+  const hasAssignedExecutive =
+    order.payment_status === "verified" &&
+    order.status === "confirmed" &&
+    Boolean(order.design_executive_name);
+  const assignedExecutive = hasAssignedExecutive
+    ? getDesignExecutiveByAssignedName(order.design_executive_name)
+    : null;
   const statusCopy = getCustomerOrderStatus({
     orderStatus: order.status,
     paymentStatus: order.payment_status,
-    designExecutiveName: order.design_executive_name,
+    designExecutiveName: assignedExecutive?.name ?? null,
+    hasAssignedExecutive,
   });
   const pickupAddress = [
     order.pickup_address_line1_snapshot,
@@ -238,6 +248,12 @@ export default async function CustomerOrderConfirmationPage({
             paymentRejectionReason={order.payment_rejection_reason}
             paymentStatus={order.payment_status}
           />
+
+          {hasAssignedExecutive && order.design_executive_name ? (
+            <AssignedDesignExecutive
+              assignedName={order.design_executive_name}
+            />
+          ) : null}
 
           <section className="order-detail-section">
             <h2>Pickup address</h2>

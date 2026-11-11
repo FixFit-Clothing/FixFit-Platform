@@ -573,6 +573,60 @@
   margin: 0;
 }
 
+.assigned-executive {
+  display: grid;
+  gap: 12px;
+  margin-top: 24px;
+  padding: 24px;
+  background: var(--cream);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.assigned-executive h2,
+.assigned-executive p {
+  margin: 0;
+}
+
+.assigned-executive > p:not(.section-eyebrow) {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.assigned-executive-details {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin: 4px 0 0;
+}
+
+.assigned-executive-details div {
+  padding: 12px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.assigned-executive-details dt {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.assigned-executive-details dd {
+  margin: 5px 0 0;
+  color: var(--charcoal);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.assigned-executive-details a {
+  color: var(--saffron-deep);
+}
+
 .account-history ul {
   padding-left: 18px;
 }
@@ -601,6 +655,10 @@
 
   .account-order-header {
     flex-direction: column;
+  }
+
+  .assigned-executive-details {
+    grid-template-columns: 1fr;
   }
 
   .checkout-customer-heading {

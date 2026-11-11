@@ -11,6 +11,7 @@ import {
   getPaymentStatusLabel,
   type PaymentStatus,
 } from "@/lib/customer-order-status";
+import { getDesignExecutiveByAssignedName } from "@/lib/design-executives";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -149,16 +150,30 @@ export default async function AccountPage({
             ) : orders?.length ? (
               <div className="account-orders">
                 {(orders as AccountOrder[]).map((order) => {
-                  const status = getCustomerOrderStatus({
-                    orderStatus: order.status,
-                    paymentStatus: order.payment_status,
-                    designExecutiveName: order.design_executive_name,
-                  });
                   const initialAmountDue =
                     order.booking_fee_amount + order.rush_fee_amount;
                   const rejectionReason = getCustomerPaymentRejectionReason(
                     order.payment_rejection_reason
                   );
+                  const assignedExecutive =
+                    order.payment_status === "verified" &&
+                    order.status === "confirmed" &&
+                    order.design_executive_name
+                      ? getDesignExecutiveByAssignedName(
+                          order.design_executive_name
+                        )
+                      : null;
+                  const hasUnknownAssignedExecutive =
+                    order.payment_status === "verified" &&
+                    order.status === "confirmed" &&
+                    order.design_executive_name &&
+                    !assignedExecutive;
+                  const status = getCustomerOrderStatus({
+                    orderStatus: order.status,
+                    paymentStatus: order.payment_status,
+                    designExecutiveName: assignedExecutive?.name ?? null,
+                    hasAssignedExecutive: Boolean(hasUnknownAssignedExecutive),
+                  });
                   const pickupAddress = [
                     order.pickup_address_line1_snapshot,
                     order.pickup_locality_snapshot,
@@ -201,6 +216,17 @@ export default async function AccountPage({
                           {getPaymentStatusLabel(order.payment_status)}
                         </p>
                         {status.nextStep ? <p>{status.nextStep}</p> : null}
+                        {assignedExecutive ? (
+                          <p>
+                            <strong>Design executive assigned:</strong>{" "}
+                            {assignedExecutive.name}
+                          </p>
+                        ) : hasUnknownAssignedExecutive ? (
+                          <p>
+                            <strong>Design executive assigned.</strong> View
+                            details for contact information.
+                          </p>
+                        ) : null}
                         {order.payment_status === "rejected" &&
                         rejectionReason ? (
                           <p>

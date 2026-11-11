@@ -29,12 +29,14 @@ type CustomerOrderStatusInput = {
   orderStatus: string;
   paymentStatus: PaymentStatus;
   designExecutiveName: string | null;
+  hasAssignedExecutive?: boolean;
 };
 
 export function getCustomerOrderStatus({
   orderStatus,
   paymentStatus,
   designExecutiveName,
+  hasAssignedExecutive = false,
 }: CustomerOrderStatusInput) {
   if (orderStatus === "cancelled") {
     return {
@@ -50,7 +52,9 @@ export function getCustomerOrderStatus({
       detail: "Your payment has been verified and your booking is confirmed.",
       nextStep: designExecutiveName
         ? `Your design executive has been assigned: ${designExecutiveName}`
-        : "Your design executive is awaiting allocation.",
+        : hasAssignedExecutive
+          ? "Your design executive has been assigned. Contact details will be shared when available."
+          : "Your design executive is awaiting allocation.",
     };
   }
 
@@ -87,7 +91,9 @@ export function getCustomerOrderStatus({
       detail: "Your booking is confirmed.",
       nextStep: designExecutiveName
         ? `Your design executive has been assigned: ${designExecutiveName}`
-        : "Your design executive is awaiting allocation.",
+        : hasAssignedExecutive
+          ? "Your design executive has been assigned. Contact details will be shared when available."
+          : "Your design executive is awaiting allocation.",
     };
   }
 
